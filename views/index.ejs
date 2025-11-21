@@ -9,50 +9,52 @@
 <body>
   <%- include('partials/header') %>
 
-  <section class="hero">
-    <div class="container">
-      <h1>FLORIST</h1>
-      <p>Минималистичная элегантность в каждом букете</p>
-      <a href="/catalog" class="btn">Смотреть каталог</a>
-    </div>
-  </section>
+  <main>
+    <section class="hero">
+      <div class="container">
+        <h1>FLORIST</h1>
+        <p>Минималистичная элегантность в каждом букете</p>
+        <a href="/catalog" class="btn">Смотреть каталог</a>
+      </div>
+    </section>
 
-  <section class="section">
-    <div class="container">
-      <h2 class="section-title">Избранные цветы</h2>
-      <div class="grid">
-        <% featuredFlowers.forEach(flower => { %>
-          <div class="card">
-            <img src="<%= flower.image_url %>" alt="<%= flower.name %>">
-            <h3><%= flower.name %></h3>
-            <p><%= flower.description %></p>
-            <div class="price"><%= flower.price %> ₽</div>
-            <a href="/product/<%= flower.id %>" class="btn btn-secondary">Подробнее</a>
+    <section class="section">
+      <div class="container">
+        <h2 class="section-title">Избранные цветы</h2>
+        <div class="grid">
+          <% featuredFlowers.forEach(flower => { %>
+            <div class="card">
+              <img src="<%= flower.image_url %>" alt="<%= flower.name %>">
+              <h3><%= flower.name %></h3>
+              <p><%= flower.description %></p>
+              <div class="price"><%= flower.price %> ₽</div>
+              <a href="/product/<%= flower.id %>" class="btn btn-secondary">Подробнее</a>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" style="background-color: #f9f9f9; border-top: 1px solid #000; border-bottom: 1px solid #000;">
+      <div class="container">
+        <h2 class="section-title">Почему выбирают нас</h2>
+        <div class="grid">
+          <div class="info-section">
+            <h2>Качество</h2>
+            <p>Только свежие цветы от проверенных поставщиков</p>
           </div>
-        <% }) %>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" style="background-color: #f9f9f9; border-top: 1px solid #000; border-bottom: 1px solid #000;">
-    <div class="container">
-      <h2 class="section-title">Почему выбирают нас</h2>
-      <div class="grid">
-        <div class="info-section">
-          <h2>Качество</h2>
-          <p>Только свежие цветы от проверенных поставщиков</p>
-        </div>
-        <div class="info-section">
-          <h2>Доставка</h2>
-          <p>Быстрая и бережная доставка по всему городу</p>
-        </div>
-        <div class="info-section">
-          <h2>Индивидуальность</h2>
-          <p>Каждый букет создается с вниманием к деталям</p>
+          <div class="info-section">
+            <h2>Доставка</h2>
+            <p>Быстрая и бережная доставка по всему городу</p>
+          </div>
+          <div class="info-section">
+            <h2>Индивидуальность</h2>
+            <p>Каждый букет создается с вниманием к деталям</p>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
   <%- include('partials/footer') %>
 </body>

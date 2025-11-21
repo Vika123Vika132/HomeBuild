@@ -9,53 +9,55 @@
 <body>
   <%- include('partials/header') %>
 
-  <section class="section">
-    <div class="container">
-      <div class="auth-container">
-        <h2>Добро пожаловать</h2>
-        
-        <div class="auth-tabs">
-          <button class="auth-tab active" onclick="showTab('login')">Вход</button>
-          <button class="auth-tab" onclick="showTab('register')">Регистрация</button>
+  <main>
+    <section class="section">
+      <div class="container">
+        <div class="auth-container">
+          <h2>Добро пожаловать</h2>
+          
+          <div class="auth-tabs">
+            <button class="auth-tab active" onclick="showTab('login')">Вход</button>
+            <button class="auth-tab" onclick="showTab('register')">Регистрация</button>
+          </div>
+
+          <div id="error-message" class="error-message"></div>
+          <div id="success-message" class="success-message"></div>
+
+          <form id="login-form" class="auth-form active" onsubmit="handleLogin(event)">
+            <div class="form-group">
+              <label for="login-email">Email</label>
+              <input type="email" id="login-email" required placeholder="Введите email">
+            </div>
+            <div class="form-group">
+              <label for="login-password">Пароль</label>
+              <input type="password" id="login-password" required placeholder="Введите пароль">
+            </div>
+            <button type="submit" class="btn">Войти</button>
+          </form>
+
+          <form id="register-form" class="auth-form" onsubmit="handleRegister(event)">
+            <div class="form-group">
+              <label for="register-username">Имя пользователя</label>
+              <input type="text" id="register-username" required placeholder="Введите имя пользователя">
+            </div>
+            <div class="form-group">
+              <label for="register-email">Email</label>
+              <input type="email" id="register-email" required placeholder="Введите email">
+            </div>
+            <div class="form-group">
+              <label for="register-password">Пароль</label>
+              <input type="password" id="register-password" required placeholder="Введите пароль">
+            </div>
+            <div class="form-group">
+              <label for="register-password-confirm">Подтвердите пароль</label>
+              <input type="password" id="register-password-confirm" required placeholder="Подтвердите пароль">
+            </div>
+            <button type="submit" class="btn">Зарегистрироваться</button>
+          </form>
         </div>
-
-        <div id="error-message" class="error-message"></div>
-        <div id="success-message" class="success-message"></div>
-
-        <form id="login-form" class="auth-form active" onsubmit="handleLogin(event)">
-          <div class="form-group">
-            <label for="login-email">Email</label>
-            <input type="email" id="login-email" required placeholder="Введите email">
-          </div>
-          <div class="form-group">
-            <label for="login-password">Пароль</label>
-            <input type="password" id="login-password" required placeholder="Введите пароль">
-          </div>
-          <button type="submit" class="btn">Войти</button>
-        </form>
-
-        <form id="register-form" class="auth-form" onsubmit="handleRegister(event)">
-          <div class="form-group">
-            <label for="register-username">Имя пользователя</label>
-            <input type="text" id="register-username" required placeholder="Введите имя пользователя">
-          </div>
-          <div class="form-group">
-            <label for="register-email">Email</label>
-            <input type="email" id="register-email" required placeholder="Введите email">
-          </div>
-          <div class="form-group">
-            <label for="register-password">Пароль</label>
-            <input type="password" id="register-password" required placeholder="Введите пароль">
-          </div>
-          <div class="form-group">
-            <label for="register-password-confirm">Подтвердите пароль</label>
-            <input type="password" id="register-password-confirm" required placeholder="Подтвердите пароль">
-          </div>
-          <button type="submit" class="btn">Зарегистрироваться</button>
-        </form>
       </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
   <%- include('partials/footer') %>
 

@@ -9,32 +9,34 @@
 <body>
   <%- include('partials/header') %>
 
-  <section class="section">
-    <div class="container">
-      <div class="product-detail">
-        <div class="product-image">
-          <img src="<%= flower.image_url %>" alt="<%= flower.name %>">
-        </div>
-        <div class="product-info">
-          <h1><%= flower.name %></h1>
-          <div class="price"><%= flower.price %> ₽</div>
-          <div class="description">
-            <p><%= flower.description %></p>
-            <p style="margin-top: 1rem; color: #999;">В наличии: <%= flower.stock %> шт.</p>
+  <main>
+    <section class="section">
+      <div class="container">
+        <div class="product-detail">
+          <div class="product-image">
+            <img src="<%= flower.image_url %>" alt="<%= flower.name %>">
           </div>
-          
-          <div class="quantity-selector">
-            <button onclick="decreaseQuantity()">-</button>
-            <input type="number" id="quantity" value="1" min="1" max="<%= flower.stock %>">
-            <button onclick="increaseQuantity()">+</button>
+          <div class="product-info">
+            <h1><%= flower.name %></h1>
+            <div class="price"><%= flower.price %> ₽</div>
+            <div class="description">
+              <p><%= flower.description %></p>
+              <p style="margin-top: 1rem; color: #999;">В наличии: <%= flower.stock %> шт.</p>
+            </div>
+            
+            <div class="quantity-selector">
+              <button onclick="decreaseQuantity()">-</button>
+              <input type="number" id="quantity" value="1" min="1" max="<%= flower.stock %>">
+              <button onclick="increaseQuantity()">+</button>
+            </div>
+            
+            <button class="btn" onclick="addToCart(<%= flower.id %>)">Добавить в корзину</button>
+            <a href="/catalog" class="btn btn-secondary" style="margin-left: 1rem;">Назад к каталогу</a>
           </div>
-          
-          <button class="btn" onclick="addToCart(<%= flower.id %>)">Добавить в корзину</button>
-          <a href="/catalog" class="btn btn-secondary" style="margin-left: 1rem;">Назад к каталогу</a>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
   <%- include('partials/footer') %>
 
@@ -70,14 +72,8 @@
         });
         
         const data = await response.json();
-        
-        if (data.success) {
-          alert('Товар добавлен в корзину!');
-        } else {
-          alert('Ошибка при добавлении в корзину');
-        }
       } catch (error) {
-        alert('Ошибка при добавлении в корзину');
+        console.error('Ошибка при добавлении в корзину');
       }
     }
   </script>
