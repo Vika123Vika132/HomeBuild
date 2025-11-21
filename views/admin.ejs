@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Админ-панель - Florist</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .admin-section {
+      margin-bottom: 4rem;
+    }
+    .admin-tabs {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid #000;
+    }
+    .admin-tab {
+      padding: 1rem 2rem;
+      background: #fff;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      border-bottom: 2px solid transparent;
+    }
+    .admin-tab.active {
+      border-bottom: 2px solid #000;
+    }
+    .admin-content {
+      display: none;
+    }
+    .admin-content.active {
+      display: block;
+    }
+    .flower-list {
+      margin-bottom: 2rem;
+    }
+    .flower-item {
+      border: 1px solid #000;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .flower-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .order-item {
+      border: 1px solid #000;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">Панель администратора</h2>
+
+      <div class="admin-tabs">
+        <button class="admin-tab active" onclick="showAdminTab('flowers')">Управление цветами</button>
+        <button class="admin-tab" onclick="showAdminTab('orders')">Заказы</button>
+      </div>
+
+      <div id="flowers-tab" class="admin-content active">
+        <h3 style="margin-bottom: 2rem; font-weight: 300; font-size: 1.5rem;">Добавить новый цветок</h3>
+        <form onsubmit="addFlower(event)" style="max-width: 600px; margin-bottom: 3rem; padding: 2rem; border: 1px solid #000;">
+          <div class="form-group">
+            <label for="add-name">Название</label>
+            <input type="text" id="add-name" required>
+          </div>
+          <div class="form-group">
+            <label for="add-description">Описание</label>
+            <textarea id="add-description" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="add-price">Цена (₽)</label>
+            <input type="number" id="add-price" required min="0" step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="add-stock">Количество</label>
+            <input type="number" id="add-stock" required min="0">
+          </div>
+          <div class="form-group">
+            <label for="add-image">URL изображения (необязательно)</label>
+            <input type="text" id="add-image">
+          </div>
+          <button type="submit" class="btn">Добавить</button>
+        </form>
+
+        <h3 style="margin-bottom: 2rem; font-weight: 300; font-size: 1.5rem;">Список цветов</h3>
+        <div class="flower-list">
+          <% flowers.forEach(flower => { %>
+            <div class="flower-item" id="flower-<%= flower.id %>">
+              <div>
+                <strong><%= flower.name %></strong> - <%= flower.price %> ₽ (в наличии: <%= flower.stock %>)
+              </div>
+              <div class="flower-actions">
+                <button class="btn btn-secondary" onclick="editFlower(<%= flower.id %>, '<%= flower.name %>', '<%= flower.description %>', <%= flower.price %>, <%= flower.stock %>, '<%= flower.image_url %>')">Редактировать</button>
+                <button class="remove-btn" onclick="deleteFlower(<%= flower.id %>)">Удалить</button>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+
+      <div id="orders-tab" class="admin-content">
+        <h3 style="margin-bottom: 2rem; font-weight: 300; font-size: 1.5rem;">История заказов</h3>
+        <% if (orders.length === 0) { %>
+          <p style="color: #666;">Заказов пока нет</p>
+        <% } else { %>
+          <% orders.forEach(order => { %>
+            <div class="order-item">
+              <p><strong>Заказ #<%= order.id %></strong></p>
+              <p>Клиент: <%= order.username %></p>
+              <p>Сумма: <%= order.total_amount %> ₽</p>
+              <p>Адрес: <%= order.delivery_address %></p>
+              <p>Дата доставки: <%= order.delivery_date %></p>
+              <p>Статус: <%= order.status %></p>
+              <p>Создан: <%= new Date(order.created_at).toLocaleString('ru-RU') %></p>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+    </div>
+  </section>
+
+  <div id="edit-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center;">
+    <div style="background: #fff; padding: 2rem; max-width: 600px; width: 90%; border: 2px solid #000;">
+      <h3 style="margin-bottom: 2rem; font-weight: 300;">Редактировать цветок</h3>
+      <form onsubmit="updateFlower(event)">
+        <input type="hidden" id="edit-id">
+        <div class="form-group">
+          <label for="edit-name">Название</label>
+          <input type="text" id="edit-name" required>
+        </div>
+        <div class="form-group">
+          <label for="edit-description">Описание</label>
+          <textarea id="edit-description" required></textarea>
+        </div>
+        <div class="form-group">
+          <label for="edit-price">Цена (₽)</label>
+          <input type="number" id="edit-price" required min="0" step="0.01">
+        </div>
+        <div class="form-group">
+          <label for="edit-stock">Количество</label>
+          <input type="number" id="edit-stock" required min="0">
+        </div>
+        <div class="form-group">
+          <label for="edit-image">URL изображения</label>
+          <input type="text" id="edit-image">
+        </div>
+        <button type="submit" class="btn">Сохранить</button>
+        <button type="button" class="btn btn-secondary" onclick="closeEditModal()" style="margin-left: 1rem;">Отмена</button>
+      </form>
+    </div>
+  </div>
+
+  <%- include('partials/footer') %>
+
+  <script>
+    function showAdminTab(tab) {
+      const tabs = document.querySelectorAll('.admin-tab');
+      const contents = document.querySelectorAll('.admin-content');
+      
+      tabs.forEach(t => t.classList.remove('active'));
+      contents.forEach(c => c.classList.remove('active'));
+      
+      if (tab === 'flowers') {
+        tabs[0].classList.add('active');
+        document.getElementById('flowers-tab').classList.add('active');
+      } else {
+        tabs[1].classList.add('active');
+        document.getElementById('orders-tab').classList.add('active');
+      }
+    }
+
+    async function addFlower(event) {
+      event.preventDefault();
+      
+      const name = document.getElementById('add-name').value;
+      const description = document.getElementById('add-description').value;
+      const price = document.getElementById('add-price').value;
+      const stock = document.getElementById('add-stock').value;
+      const image_url = document.getElementById('add-image').value;
+      
+      try {
+        const response = await fetch('/admin/flower/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, description, price, stock, image_url })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          alert('Цветок успешно добавлен!');
+          location.reload();
+        } else {
+          alert('Ошибка: ' + (data.error || 'Не удалось добавить цветок'));
+        }
+      } catch (error) {
+        alert('Ошибка при добавлении цветка');
+      }
+    }
+
+    function editFlower(id, name, description, price, stock, image_url) {
+      document.getElementById('edit-id').value = id;
+      document.getElementById('edit-name').value = name;
+      document.getElementById('edit-description').value = description;
+      document.getElementById('edit-price').value = price;
+      document.getElementById('edit-stock').value = stock;
+      document.getElementById('edit-image').value = image_url;
+      
+      document.getElementById('edit-modal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+      document.getElementById('edit-modal').style.display = 'none';
+    }
+
+    async function updateFlower(event) {
+      event.preventDefault();
+      
+      const id = document.getElementById('edit-id').value;
+      const name = document.getElementById('edit-name').value;
+      const description = document.getElementById('edit-description').value;
+      const price = document.getElementById('edit-price').value;
+      const stock = document.getElementById('edit-stock').value;
+      const image_url = document.getElementById('edit-image').value;
+      
+      try {
+        const response = await fetch('/admin/flower/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id, name, description, price, stock, image_url })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          alert('Цветок успешно обновлен!');
+          location.reload();
+        } else {
+          alert('Ошибка: ' + (data.error || 'Не удалось обновить цветок'));
+        }
+      } catch (error) {
+        alert('Ошибка при обновлении цветка');
+      }
+    }
+
+    async function deleteFlower(id) {
+      if (!confirm('Удалить этот цветок?')) {
+        return;
+      }
+      
+      try {
+        const response = await fetch('/admin/flower/delete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          alert('Цветок успешно удален!');
+          location.reload();
+        } else {
+          alert('Ошибка: ' + (data.error || 'Не удалось удалить цветок'));
+        }
+      } catch (error) {
+        alert('Ошибка при удалении цветка');
+      }
+    }
+  </script>
+</body>
+</html>

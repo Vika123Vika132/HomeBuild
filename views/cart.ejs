@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Корзина - Florist</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <section class="section">
+    <div class="container">
+      <h2 class="section-title">Корзина</h2>
+      
+      <% if (cartItems.length === 0) { %>
+        <div style="text-align: center; padding: 3rem 0;">
+          <p style="font-size: 1.2rem; color: #666; margin-bottom: 2rem;">Ваша корзина пуста</p>
+          <a href="/catalog" class="btn">Перейти в каталог</a>
+        </div>
+      <% } else { %>
+        <table class="cart-table">
+          <thead>
+            <tr>
+              <th>Изображение</th>
+              <th>Название</th>
+              <th>Цена</th>
+              <th>Количество</th>
+              <th>Сумма</th>
+              <th>Действие</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% cartItems.forEach(item => { %>
+              <tr>
+                <td><img src="<%= item.image_url %>" alt="<%= item.name %>"></td>
+                <td><%= item.name %></td>
+                <td><%= item.price %> ₽</td>
+                <td>
+                  <input type="number" 
+                         value="<%= item.quantity %>" 
+                         min="1" 
+                         max="<%= item.stock %>"
+                         onchange="updateQuantity(<%= item.id %>, this.value)">
+                </td>
+                <td><%= (item.price * item.quantity).toFixed(2) %> ₽</td>
+                <td>
+                  <button class="remove-btn" onclick="removeFromCart(<%= item.id %>)">Удалить</button>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+
+        <div class="cart-summary">
+          <h3>Итого</h3>
+          <div class="total"><%= total.toFixed(2) %> ₽</div>
+          <% if (user) { %>
+            <button class="btn" onclick="showCheckoutForm()">Оформить заказ</button>
+          <% } else { %>
+            <p style="margin-bottom: 1rem; color: #666;">Для оформления заказа необходимо войти в систему</p>
+            <a href="/login" class="btn">Войти</a>
+          <% } %>
+        </div>
+
+        <% if (user) { %>
+          <div id="checkout-form" style="display: none; max-width: 600px; margin: 2rem auto; padding: 2rem; border: 1px solid #000;">
+            <h3 style="margin-bottom: 2rem; font-weight: 300;">Оформление заказа</h3>
+            <form onsubmit="createOrder(event)">
+              <div class="form-group">
+                <label for="address">Адрес доставки *</label>
+                <textarea id="address" required placeholder="Укажите полный адрес доставки"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="deliveryDate">Дата доставки *</label>
+                <input type="date" id="deliveryDate" required>
+              </div>
+              <button type="submit" class="btn">Подтвердить заказ</button>
+              <button type="button" class="btn btn-secondary" onclick="hideCheckoutForm()" style="margin-left: 1rem;">Отмена</button>
+            </form>
+          </div>
+        <% } %>
+      <% } %>
+    </div>
+  </section>
+
+  <%- include('partials/footer') %>
+
+  <script>
+    async function updateQuantity(flowerId, quantity) {
+      try {
+        const response = await fetch('/cart/update', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ flowerId, quantity: parseInt(quantity) })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          location.reload();
+        } else {
+          alert('Ошибка при обновлении количества');
+        }
+      } catch (error) {
+        alert('Ошибка при обновлении количества');
+      }
+    }
+
+    async function removeFromCart(flowerId) {
+      if (!confirm('Удалить товар из корзины?')) {
+        return;
+      }
+      
+      try {
+        const response = await fetch('/cart/remove', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ flowerId })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          location.reload();
+        } else {
+          alert('Ошибка при удалении товара');
+        }
+      } catch (error) {
+        alert('Ошибка при удалении товара');
+      }
+    }
+
+    function showCheckoutForm() {
+      document.getElementById('checkout-form').style.display = 'block';
+      document.getElementById('checkout-form').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function hideCheckoutForm() {
+      document.getElementById('checkout-form').style.display = 'none';
+    }
+
+    async function createOrder(event) {
+      event.preventDefault();
+      
+      const address = document.getElementById('address').value;
+      const deliveryDate = document.getElementById('deliveryDate').value;
+      
+      try {
+        const response = await fetch('/order/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ address, deliveryDate })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          alert('Заказ успешно оформлен! Номер заказа: ' + data.orderId);
+          location.href = '/';
+        } else {
+          alert('Ошибка: ' + (data.error || 'Не удалось оформить заказ'));
+        }
+      } catch (error) {
+        alert('Ошибка при оформлении заказа');
+      }
+    }
+
+    const today = new Date().toISOString().split('T')[0];
+    const deliveryDateInput = document.getElementById('deliveryDate');
+    if (deliveryDateInput) {
+      deliveryDateInput.min = today;
+    }
+  </script>
+</body>
+</html>
