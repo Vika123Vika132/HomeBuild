@@ -2,7 +2,12 @@
   <div class="container">
     <div class="header-content">
       <a href="/" class="logo">FLORIST</a>
-      <nav>
+      <div class="burger-menu" id="burger-menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <nav id="nav-menu">
         <ul>
           <li><a href="/">Главная</a></li>
           <li><a href="/catalog">Каталог</a></li>
@@ -22,3 +27,20 @@
     </div>
   </div>
 </header>
+
+<script>
+  const burgerMenu = document.getElementById('burger-menu');
+  const navMenu = document.getElementById('nav-menu');
+  
+  burgerMenu.addEventListener('click', function() {
+    burgerMenu.classList.toggle('active');
+    navMenu.classList.toggle('active');
+  });
+
+  document.querySelectorAll('#nav-menu a').forEach(link => {
+    link.addEventListener('click', function() {
+      burgerMenu.classList.remove('active');
+      navMenu.classList.remove('active');
+    });
+  });
+</script>
