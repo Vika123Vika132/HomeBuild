@@ -15,13 +15,15 @@
         <h2 class="section-title">Каталог цветов</h2>
         <div class="grid">
           <% flowers.forEach(flower => { %>
-            <div class="card">
+            <div class="card" onclick="openFlowerModal(<%= flower.id %>, '<%= flower.name %>', '<%= flower.description %>', <%= flower.price %>, '<%= flower.image_url %>', <%= flower.stock %>)">
               <img src="<%= flower.image_url %>" alt="<%= flower.name %>">
-              <h3><%= flower.name %></h3>
-              <p><%= flower.description %></p>
-              <div class="price"><%= flower.price %> ₽</div>
-              <p style="color: #999; font-size: 0.9rem;">В наличии: <%= flower.stock %> шт.</p>
-              <a href="/product/<%= flower.id %>" class="btn btn-secondary">Подробнее</a>
+              <div class="card-content">
+                <h3><%= flower.name %></h3>
+                <p><%= flower.description %></p>
+                <div class="price"><%= flower.price %> ₽</div>
+                <p style="color: #999; font-size: 0.9rem;">В наличии: <%= flower.stock %> шт.</p>
+                <button class="btn btn-secondary" onclick="event.stopPropagation();">Добавить в корзину</button>
+              </div>
             </div>
           <% }) %>
         </div>
@@ -30,5 +32,96 @@
   </main>
 
   <%- include('partials/footer') %>
+
+  <div id="flower-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span class="close" onclick="closeFlowerModal()">&times;</span>
+      <div class="modal-grid">
+        <img id="modal-image" src="" alt="" style="width: 100%; height: auto; object-fit: cover;">
+        <div>
+          <h2 id="modal-name"></h2>
+          <p id="modal-description"></p>
+          <div class="price" id="modal-price" style="font-size: 1.5rem; margin-bottom: 1rem;"></div>
+          <p id="modal-stock" style="color: #999; margin-bottom: 1rem;"></p>
+          <div class="quantity-selector">
+            <button onclick="decreaseModalQuantity()">−</button>
+            <input type="number" id="modal-quantity" value="1" min="1" readonly>
+            <button onclick="increaseModalQuantity()">+</button>
+          </div>
+          <button class="btn" id="modal-add-btn" style="width: 100%;">Добавить в корзину</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentFlowerId = null;
+    let currentFlowerStock = 0;
+
+    function openFlowerModal(flowerId, name, description, price, image, stock) {
+      currentFlowerId = flowerId;
+      currentFlowerStock = stock;
+      document.getElementById('modal-name').textContent = name;
+      document.getElementById('modal-description').textContent = description;
+      document.getElementById('modal-price').textContent = price + ' ₽';
+      document.getElementById('modal-image').src = image;
+      document.getElementById('modal-stock').textContent = 'В наличии: ' + stock + ' шт.';
+      document.getElementById('modal-quantity').value = 1;
+      document.getElementById('modal-quantity').max = stock;
+      document.getElementById('flower-modal').style.display = 'flex';
+      
+      document.getElementById('modal-add-btn').onclick = function() {
+        addModalToCart();
+      };
+    }
+
+    function closeFlowerModal() {
+      document.getElementById('flower-modal').style.display = 'none';
+    }
+
+    function increaseModalQuantity() {
+      const input = document.getElementById('modal-quantity');
+      if (parseInt(input.value) < currentFlowerStock) {
+        input.value = parseInt(input.value) + 1;
+      }
+    }
+
+    function decreaseModalQuantity() {
+      const input = document.getElementById('modal-quantity');
+      if (parseInt(input.value) > 1) {
+        input.value = parseInt(input.value) - 1;
+      }
+    }
+
+    async function addModalToCart() {
+      const quantity = parseInt(document.getElementById('modal-quantity').value);
+      
+      try {
+        const response = await fetch('/cart/add', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ flowerId: currentFlowerId, quantity })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+          const cartBadge = document.getElementById('cart-count');
+          cartBadge.textContent = data.cartCount;
+          closeFlowerModal();
+        }
+      } catch (error) {
+        console.error('Ошибка при добавлении в корзину');
+      }
+    }
+
+    window.onclick = function(event) {
+      const modal = document.getElementById('flower-modal');
+      if (event.target == modal) {
+        closeFlowerModal();
+      }
+    }
+  </script>
 </body>
 </html>
