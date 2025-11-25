@@ -373,7 +373,7 @@ nav a:hover {
   display: grid;
   grid-template-columns: 200px 1fr;
   gap: 2rem;
-  border: 1px solid #000;
+  border: 1px solid #ddd;
   padding: 1.5rem;
   align-items: start;
 }
