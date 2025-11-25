@@ -20,41 +20,36 @@
           <a href="/catalog" class="btn">Перейти в каталог</a>
         </div>
       <% } else { %>
-        <table class="cart-table">
-          <thead>
-            <tr>
-              <th>Изображение</th>
-              <th>Название</th>
-              <th>Цена</th>
-              <th>Количество</th>
-              <th>Сумма</th>
-              <th>Действие</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% cartItems.forEach(item => { %>
-              <tr>
-                <td><img src="<%= item.image_url %>" alt="<%= item.name %>"></td>
-                <td><%= item.name %></td>
-                <td><%= item.price %> ₽</td>
-                <td>
-                  <input type="number" 
-                         value="<%= item.quantity %>" 
-                         min="1" 
-                         max="<%= item.stock %>"
-                         onchange="updateQuantity(<%= item.id %>, this.value)">
-                </td>
-                <td><%= (item.price * item.quantity).toFixed(2) %> ₽</td>
-                <td>
-                  <button class="remove-btn" onclick="removeFromCart(<%= item.id %>)">Удалить</button>
-                </td>
-              </tr>
-            <% }) %>
-          </tbody>
-        </table>
+        <div class="cart-items">
+          <% cartItems.forEach(item => { %>
+            <div class="cart-item">
+              <div class="cart-item-image">
+                <img src="<%= item.image_url %>" alt="<%= item.name %>">
+              </div>
+              <div class="cart-item-content">
+                <h3><%= item.name %></h3>
+                <p class="cart-item-price"><%= item.price %> ₽ за шт.</p>
+                <div class="cart-item-controls">
+                  <div class="quantity-controls">
+                    <label>Количество:</label>
+                    <input type="number" 
+                           value="<%= item.quantity %>" 
+                           min="1" 
+                           max="<%= item.stock %>"
+                           onchange="updateQuantity(<%= item.id %>, this.value)">
+                  </div>
+                  <div class="cart-item-total">
+                    <p class="cart-item-sum"><strong><%= (item.price * item.quantity).toFixed(2) %> ₽</strong></p>
+                    <button class="remove-btn" onclick="removeFromCart(<%= item.id %>)">Удалить</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
 
         <div class="cart-summary">
-          <h3>Итого</h3>
+          <h3>Итого к оплате</h3>
           <div class="total"><%= total.toFixed(2) %> ₽</div>
           <% if (user) { %>
             <button class="btn" onclick="showCheckoutForm()">Оформить заказ</button>
