@@ -80,10 +80,11 @@ nav a:hover {
   display: none;
   align-items: center;
   justify-content: center;
+  vertical-align: middle;
 }
 
 .cart-badge:not(:empty) {
-  display: flex;
+  display: inline-flex;
 }
 
 .burger-menu {
