@@ -72,6 +72,10 @@
         });
         
         const data = await response.json();
+        if (data.success) {
+          const cartBadge = document.getElementById('cart-count');
+          cartBadge.textContent = data.cartCount;
+        }
       } catch (error) {
         console.error('Ошибка при добавлении в корзину');
       }

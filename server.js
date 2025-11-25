@@ -222,7 +222,7 @@ app.post('/cart/remove', (req, res) => {
   }
   
   req.session.cart = req.session.cart.filter(item => item.flowerId !== parseInt(flowerId));
-  res.json({ success: true });
+  res.json({ success: true, cartCount: req.session.cart.length });
 });
 
 app.post('/order/create', (req, res) => {

@@ -122,6 +122,8 @@
         const data = await response.json();
         
         if (data.success) {
+          const cartBadge = document.getElementById('cart-count');
+          cartBadge.textContent = data.cartCount;
           location.reload();
         }
       } catch (error) {
