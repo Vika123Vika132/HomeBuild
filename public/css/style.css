@@ -72,15 +72,18 @@ nav a:hover {
   background-color: #fff;
   color: #000;
   border-radius: 50%;
-  padding: 0.2rem 0.5rem;
-  font-size: 0.8rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  font-size: 0.75rem;
   font-weight: bold;
   margin-left: 0.5rem;
   display: none;
+  align-items: center;
+  justify-content: center;
 }
 
 .cart-badge:not(:empty) {
-  display: inline-block;
+  display: flex;
 }
 
 .burger-menu {

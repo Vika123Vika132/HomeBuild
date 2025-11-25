@@ -30,7 +30,7 @@
                 <h3><%= flower.name %></h3>
                 <p><%= flower.description %></p>
                 <div class="price"><%= flower.price %> ₽</div>
-                <button class="btn btn-secondary" onclick="event.stopPropagation();">Добавить в корзину</button>
+                <button class="btn btn-secondary" onclick="event.stopPropagation(); addQuickToCart(<%= flower.id %>);">Добавить в корзину</button>
               </div>
             </div>
           <% }) %>
@@ -85,6 +85,26 @@
   <script>
     let currentFlowerId = null;
     let currentFlowerStock = 0;
+
+    async function addQuickToCart(flowerId) {
+      try {
+        const response = await fetch('/cart/add', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ flowerId, quantity: 1 })
+        });
+        
+        const data = await response.json();
+        if (data.success) {
+          const cartBadge = document.getElementById('cart-count');
+          cartBadge.textContent = data.cartCount;
+        }
+      } catch (error) {
+        console.error('Ошибка при добавлении в корзину');
+      }
+    }
 
     function openFlowerModal(flowerId, name, description, price, image, stock) {
       currentFlowerId = flowerId;
