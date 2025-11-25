@@ -200,13 +200,10 @@
         const data = await response.json();
         
         if (data.success) {
-          alert('Цветок успешно добавлен!');
           location.reload();
-        } else {
-          alert('Ошибка: ' + (data.error || 'Не удалось добавить цветок'));
         }
       } catch (error) {
-        alert('Ошибка при добавлении цветка');
+        // Ошибка при добавлении цветка
       }
     }
 
@@ -245,21 +242,14 @@
         const data = await response.json();
         
         if (data.success) {
-          alert('Цветок успешно обновлен!');
           location.reload();
-        } else {
-          alert('Ошибка: ' + (data.error || 'Не удалось обновить цветок'));
         }
       } catch (error) {
-        alert('Ошибка при обновлении цветка');
+        // Ошибка при обновлении цветка
       }
     }
 
     async function deleteFlower(id) {
-      if (!confirm('Удалить этот цветок?')) {
-        return;
-      }
-      
       try {
         const response = await fetch('/admin/flower/delete', {
           method: 'POST',
@@ -270,13 +260,10 @@
         const data = await response.json();
         
         if (data.success) {
-          alert('Цветок успешно удален!');
           location.reload();
-        } else {
-          alert('Ошибка: ' + (data.error || 'Не удалось удалить цветок'));
         }
       } catch (error) {
-        alert('Ошибка при удалении цветка');
+        // Ошибка при удалении цветка
       }
     }
   </script>

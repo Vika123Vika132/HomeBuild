@@ -103,19 +103,13 @@
         
         if (data.success) {
           location.reload();
-        } else {
-          alert('Ошибка при обновлении количества');
         }
       } catch (error) {
-        alert('Ошибка при обновлении количества');
+        // Ошибка при обновлении количества
       }
     }
 
     async function removeFromCart(flowerId) {
-      if (!confirm('Удалить товар из корзины?')) {
-        return;
-      }
-      
       try {
         const response = await fetch('/cart/remove', {
           method: 'POST',
@@ -129,11 +123,9 @@
         
         if (data.success) {
           location.reload();
-        } else {
-          alert('Ошибка при удалении товара');
         }
       } catch (error) {
-        alert('Ошибка при удалении товара');
+        // Ошибка при удалении товара
       }
     }
 
@@ -164,13 +156,10 @@
         const data = await response.json();
         
         if (data.success) {
-          alert('Заказ успешно оформлен! Номер заказа: ' + data.orderId);
           location.href = '/';
-        } else {
-          alert('Ошибка: ' + (data.error || 'Не удалось оформить заказ'));
         }
       } catch (error) {
-        alert('Ошибка при оформлении заказа');
+        // Ошибка при оформлении заказа
       }
     }
 
