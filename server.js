@@ -109,8 +109,8 @@ app.use(bodyParser.json());
 app.use(session({
   secret: process.env.SESSION_SECRET || 'florist-secret-key-2024',
   resave: false,
-  saveUninitialized: false,
-  cookie: { maxAge: 24 * 60 * 60 * 1000 }
+  saveUninitialized: true,
+  cookie: { maxAge: 24 * 60 * 60 * 1000, httpOnly: true }
 }));
 
 app.use((req, res, next) => {
