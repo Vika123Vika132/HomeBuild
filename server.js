@@ -281,36 +281,22 @@ app.get('/admin', requireAdmin, (req, res) => {
   res.render('admin', { flowers, orders });
 });
 
-app.post('/admin/flower/add', requireAdmin, upload.single('image'), (req, res) => {
-  const { name, description, price, stock } = req.body;
-  let image_url = req.body.image_url || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300"%3E%3Crect fill="%23f5f5f5" width="300" height="300"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="%23333"%3EНовый цветок%3C/text%3E%3C/svg%3E';
-  
-  if (req.file) {
-    image_url = '/uploads/' + req.file.filename;
-  }
+app.post('/admin/flower/add', requireAdmin, (req, res) => {
+  const { name, description, price, stock, image_url } = req.body;
   
   try {
-    db.prepare('INSERT INTO flowers (name, description, price, image_url, stock) VALUES (?, ?, ?, ?, ?)').run(name, description, parseFloat(price), image_url, parseInt(stock));
+    db.prepare('INSERT INTO flowers (name, description, price, image_url, stock) VALUES (?, ?, ?, ?, ?)').run(name, description, parseFloat(price), image_url || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300"%3E%3Crect fill="%23f5f5f5" width="300" height="300"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="%23333"%3EНовый цветок%3C/text%3E%3C/svg%3E', parseInt(stock));
     res.json({ success: true });
   } catch (error) {
     res.json({ success: false, error: 'Ошибка добавления товара' });
   }
 });
 
-app.post('/admin/flower/update', requireAdmin, upload.single('image'), (req, res) => {
-  const { id, name, description, price, stock } = req.body;
-  let image_url = req.body.image_url;
-  
-  if (req.file) {
-    image_url = '/uploads/' + req.file.filename;
-  }
+app.post('/admin/flower/update', requireAdmin, (req, res) => {
+  const { id, name, description, price, stock, image_url } = req.body;
   
   try {
-    if (image_url) {
-      db.prepare('UPDATE flowers SET name = ?, description = ?, price = ?, image_url = ?, stock = ? WHERE id = ?').run(name, description, parseFloat(price), image_url, parseInt(stock), parseInt(id));
-    } else {
-      db.prepare('UPDATE flowers SET name = ?, description = ?, price = ?, stock = ? WHERE id = ?').run(name, description, parseFloat(price), parseInt(stock), parseInt(id));
-    }
+    db.prepare('UPDATE flowers SET name = ?, description = ?, price = ?, image_url = ?, stock = ? WHERE id = ?').run(name, description, parseFloat(price), image_url, parseInt(stock), parseInt(id));
     res.json({ success: true });
   } catch (error) {
     res.json({ success: false, error: 'Ошибка обновления товара' });
