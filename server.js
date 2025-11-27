@@ -121,7 +121,7 @@ app.use((req, res, next) => {
 
 function requireAdmin(req, res, next) {
   if (!req.session.user || req.session.user.role !== 'admin') {
-    return res.status(403).json({ success: false, error: 'Доступ запрещен' });
+    return res.redirect('/login');
   }
   next();
 }
