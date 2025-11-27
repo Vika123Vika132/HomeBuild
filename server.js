@@ -181,7 +181,7 @@ app.post('/login', async (req, res) => {
   }
   
   req.session.user = { id: user.id, username: user.username, email: user.email, role: user.role };
-  res.json({ success: true });
+  res.json({ success: true, role: user.role });
 });
 
 app.get('/logout', (req, res) => {
