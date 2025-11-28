@@ -127,7 +127,8 @@
     }
 
     function showCheckoutForm() {
-      window.location.href = '/delivery';
+      document.getElementById('checkout-form').style.display = 'block';
+      document.getElementById('checkout-form').scrollIntoView({ behavior: 'smooth' });
     }
 
     function hideCheckoutForm() {

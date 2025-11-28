@@ -5,84 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Доставка и оплата - Florist</title>
   <link rel="stylesheet" href="/css/style.css">
-  <style>
-    .checkout-form {
-      max-width: 600px;
-      margin: 2rem auto;
-      padding: 2rem;
-      border: 1px solid #e8e8e8;
-      border-radius: 8px;
-    }
-    .checkout-step {
-      margin-bottom: 2rem;
-      padding: 1.5rem;
-      border: 1px solid #e8e8e8;
-      border-radius: 8px;
-      display: none;
-    }
-    .checkout-step.active {
-      display: block;
-    }
-    .checkout-step h3 {
-      margin-bottom: 1rem;
-      font-weight: 300;
-      font-size: 1.2rem;
-    }
-    .form-group {
-      margin-bottom: 1rem;
-    }
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-    }
-    .form-group input,
-    .form-group textarea,
-    .form-group select {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #e8e8e8;
-      border-radius: 4px;
-      font-size: 1rem;
-      font-family: Arial, sans-serif;
-    }
-    .success-message {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #fff;
-      padding: 3rem;
-      border: 1px solid #e8e8e8;
-      border-radius: 8px;
-      text-align: center;
-      z-index: 2000;
-      max-width: 400px;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      display: none;
-    }
-    .success-message.active {
-      display: block;
-    }
-    .success-message h2 {
-      margin-bottom: 1rem;
-      font-size: 1.5rem;
-    }
-    .success-message p {
-      font-size: 1.1rem;
-      color: #666;
-    }
-    .buttons {
-      display: flex;
-      gap: 1rem;
-      justify-content: space-between;
-    }
-    .btn-secondary {
-      background: #f5f5f5;
-      color: #000;
-      border: 1px solid #e8e8e8;
-    }
-  </style>
 </head>
 <body>
   <%- include('partials/header') %>
@@ -90,131 +12,47 @@
   <main>
     <section class="section">
       <div class="container">
-        <h2 class="section-title">Оформление заказа</h2>
+        <h2 class="section-title">Доставка и оплата</h2>
         
-        <div class="checkout-form">
-          <div class="checkout-step active" id="address-step">
-            <h3>Шаг 1: Адрес доставки</h3>
-            <div class="form-group">
-              <label for="delivery-address">Адрес доставки</label>
-              <textarea id="delivery-address" required placeholder="Введите адрес"></textarea>
-            </div>
-            <div class="form-group">
-              <label for="delivery-date">Дата доставки</label>
-              <input type="date" id="delivery-date" required>
-            </div>
-            <div class="buttons">
-              <a href="/cart" class="btn btn-secondary">Назад в корзину</a>
-              <button class="btn" onclick="confirmAddress()">Подтвердить адрес</button>
-            </div>
-          </div>
-
-          <div class="checkout-step" id="payment-step">
-            <h3>Шаг 2: Выбор способа оплаты</h3>
-            <div class="form-group">
-              <label for="payment-method">Способ оплаты</label>
-              <select id="payment-method" required>
-                <option value="">Выберите способ оплаты</option>
-                <option value="card">Банковская карта</option>
-                <option value="cash">Наличные курьеру</option>
-                <option value="online">Электронный платеж</option>
-              </select>
-            </div>
-            <div class="form-group" id="card-details" style="display: none;">
-              <label for="card-number">Номер карты</label>
-              <input type="text" id="card-number" placeholder="0000 0000 0000 0000">
-              <label for="card-expiry" style="margin-top: 1rem;">Срок действия</label>
-              <input type="text" id="card-expiry" placeholder="MM/YY">
-              <label for="card-cvc" style="margin-top: 1rem;">CVC</label>
-              <input type="text" id="card-cvc" placeholder="000">
-            </div>
-            <div class="buttons">
-              <button class="btn btn-secondary" onclick="backToAddress()">Назад</button>
-              <button class="btn" onclick="confirmPayment()">Оформить заказ</button>
-            </div>
-          </div>
+        <div class="info-section">
+          <h2>Условия доставки</h2>
+          <p>Мы осуществляем доставку цветов по всему городу. Наши курьеры бережно относятся к каждому заказу, гарантируя свежесть и сохранность букетов.</p>
+          <ul>
+            <li>Доставка в пределах города — 300 ₽</li>
+            <li>Бесплатная доставка при заказе от 3000 ₽</li>
+            <li>Доставка осуществляется ежедневно с 9:00 до 21:00</li>
+            <li>Возможна срочная доставка (в течение 2 часов) — +500 ₽</li>
+          </ul>
         </div>
 
-        <div class="success-message" id="success-message">
-          <h2>Спасибо за заказ!</h2>
-          <p>Ваш заказ успешно оформлен</p>
-          <p style="margin-top: 1.5rem; color: #999;">Номер заказа: <strong id="order-id"></strong></p>
-          <a href="/" class="btn" style="margin-top: 1.5rem;">На главную</a>
+        <div class="info-section">
+          <h2>Способы оплаты</h2>
+          <p>Мы принимаем следующие способы оплаты:</p>
+          <ul>
+            <li>Банковские карты (Visa, MasterCard, Мир)</li>
+            <li>Наличные курьеру при получении</li>
+            <li>Электронные платежи</li>
+            <li>Оплата по счету для юридических лиц</li>
+          </ul>
         </div>
 
-        <div style="text-align: center; margin-top: 3rem; color: #666;">
-          <h2>Информация о доставке и оплате</h2>
-          <div class="info-section" style="margin-top: 2rem;">
-            <h3>Условия доставки</h3>
-            <ul style="text-align: left; max-width: 500px; margin: 1rem auto;">
-              <li>Доставка в пределах города — 300 ₽</li>
-              <li>Бесплатная доставка при заказе от 3000 ₽</li>
-              <li>Доставка осуществляется ежедневно с 9:00 до 21:00</li>
-            </ul>
-          </div>
+        <div class="info-section">
+          <h2>Гарантии качества</h2>
+          <p>Мы гарантируем свежесть наших цветов. Если вы не удовлетворены качеством доставленных цветов, мы готовы заменить букет или вернуть деньги.</p>
+          <ul>
+            <li>Все цветы свежие, от проверенных поставщиков</li>
+            <li>Гарантия свежести — 7 дней</li>
+            <li>Бесплатная замена при обнаружении дефектов</li>
+          </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: 3rem;">
+          <a href="/catalog" class="btn">Перейти в каталог</a>
         </div>
       </div>
     </section>
   </main>
 
   <%- include('partials/footer') %>
-
-  <script>
-    document.getElementById('payment-method').addEventListener('change', function() {
-      const cardDetails = document.getElementById('card-details');
-      if (this.value === 'card') {
-        cardDetails.style.display = 'block';
-      } else {
-        cardDetails.style.display = 'none';
-      }
-    });
-
-    function confirmAddress() {
-      const address = document.getElementById('delivery-address').value.trim();
-      const date = document.getElementById('delivery-date').value;
-      
-      if (!address || !date) {
-        return;
-      }
-      
-      document.getElementById('address-step').classList.remove('active');
-      document.getElementById('payment-step').classList.add('active');
-    }
-
-    function backToAddress() {
-      document.getElementById('payment-step').classList.remove('active');
-      document.getElementById('address-step').classList.add('active');
-    }
-
-    async function confirmPayment() {
-      const address = document.getElementById('delivery-address').value.trim();
-      const date = document.getElementById('delivery-date').value;
-      const paymentMethod = document.getElementById('payment-method').value;
-      
-      if (!address || !date || !paymentMethod) {
-        return;
-      }
-      
-      try {
-        const response = await fetch('/order/create', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ address, deliveryDate: date })
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-          document.getElementById('payment-step').classList.remove('active');
-          document.getElementById('order-id').textContent = data.orderId;
-          document.getElementById('success-message').classList.add('active');
-        }
-      } catch (error) {
-      }
-    }
-
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('delivery-date').min = today;
-  </script>
 </body>
 </html>
