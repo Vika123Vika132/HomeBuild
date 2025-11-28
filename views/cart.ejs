@@ -87,6 +87,20 @@
       border-radius: 4px;
       cursor: pointer;
     }
+    .error-message {
+      color: #d32f2f;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+      display: none;
+    }
+    .error-message.show {
+      display: block;
+    }
+    .form-group.error input,
+    .form-group.error textarea,
+    .form-group.error select {
+      border-color: #d32f2f;
+    }
   </style>
 </head>
 <body>
@@ -146,13 +160,15 @@
           <div id="checkout-form" class="checkout-form">
             <div class="checkout-step active" id="address-step">
               <h3>Адрес доставки</h3>
-              <div class="form-group">
+              <div class="form-group" id="address-group">
                 <label for="address">Адрес доставки *</label>
-                <textarea id="address" required placeholder="Укажите полный адрес доставки"></textarea>
+                <textarea id="address" placeholder="Укажите полный адрес доставки"></textarea>
+                <div class="error-message" id="address-error">Пожалуйста, укажите адрес</div>
               </div>
-              <div class="form-group">
+              <div class="form-group" id="date-group">
                 <label for="deliveryDate">Дата доставки *</label>
-                <input type="date" id="deliveryDate" required>
+                <input type="date" id="deliveryDate">
+                <div class="error-message" id="date-error">Пожалуйста, выберите дату</div>
               </div>
               <div class="buttons">
                 <button type="button" class="btn-secondary" onclick="hideCheckoutForm()">Отмена</button>
@@ -162,22 +178,26 @@
 
             <div class="checkout-step" id="payment-step">
               <h3>Выбор способа оплаты</h3>
-              <div class="form-group">
+              <div class="form-group" id="payment-group">
                 <label for="payment-method">Способ оплаты</label>
-                <select id="payment-method" required>
+                <select id="payment-method">
                   <option value="">Выберите способ оплаты</option>
                   <option value="card">Банковская карта</option>
                   <option value="cash">Наличные курьеру</option>
                   <option value="online">Электронный платеж</option>
                 </select>
+                <div class="error-message" id="payment-error">Пожалуйста, выберите способ оплаты</div>
               </div>
               <div class="form-group" id="card-details" style="display: none;">
                 <label for="card-number">Номер карты</label>
                 <input type="text" id="card-number" placeholder="0000 0000 0000 0000">
+                <div class="error-message" id="card-number-error">Номер карты должен содержать 16 цифр</div>
                 <label for="card-expiry" style="margin-top: 1rem;">Срок действия</label>
                 <input type="text" id="card-expiry" placeholder="MM/YY">
+                <div class="error-message" id="card-expiry-error">Укажите в формате MM/YY</div>
                 <label for="card-cvc" style="margin-top: 1rem;">CVC</label>
                 <input type="text" id="card-cvc" placeholder="000">
+                <div class="error-message" id="card-cvc-error">CVC должен содержать 3 цифры</div>
               </div>
               <div class="buttons">
                 <button type="button" class="btn-secondary" onclick="backToAddress()">Назад</button>
@@ -257,13 +277,32 @@
     function confirmAddress() {
       const address = document.getElementById('address').value.trim();
       const date = document.getElementById('deliveryDate').value;
-      
-      if (!address || !date) {
-        return;
+      let valid = true;
+
+      // Очищаем ошибки
+      document.getElementById('address-group').classList.remove('error');
+      document.getElementById('address-error').classList.remove('show');
+      document.getElementById('date-group').classList.remove('error');
+      document.getElementById('date-error').classList.remove('show');
+
+      // Валидируем адрес
+      if (!address) {
+        document.getElementById('address-group').classList.add('error');
+        document.getElementById('address-error').classList.add('show');
+        valid = false;
       }
-      
-      document.getElementById('address-step').classList.remove('active');
-      document.getElementById('payment-step').classList.add('active');
+
+      // Валидируем дату
+      if (!date) {
+        document.getElementById('date-group').classList.add('error');
+        document.getElementById('date-error').classList.add('show');
+        valid = false;
+      }
+
+      if (valid) {
+        document.getElementById('address-step').classList.remove('active');
+        document.getElementById('payment-step').classList.add('active');
+      }
     }
 
     function backToAddress() {
@@ -284,8 +323,51 @@
       const address = document.getElementById('address').value.trim();
       const date = document.getElementById('deliveryDate').value;
       const paymentMethod = document.getElementById('payment-method').value;
-      
-      if (!address || !date || !paymentMethod) {
+      let valid = true;
+
+      // Очищаем ошибки
+      document.getElementById('payment-group').classList.remove('error');
+      document.getElementById('payment-error').classList.remove('show');
+      document.getElementById('card-number-error').classList.remove('show');
+      document.getElementById('card-expiry-error').classList.remove('show');
+      document.getElementById('card-cvc-error').classList.remove('show');
+      document.getElementById('card-number').parentElement.classList.remove('error');
+      document.getElementById('card-expiry').parentElement.classList.remove('error');
+      document.getElementById('card-cvc').parentElement.classList.remove('error');
+
+      // Валидируем способ оплаты
+      if (!paymentMethod) {
+        document.getElementById('payment-group').classList.add('error');
+        document.getElementById('payment-error').classList.add('show');
+        valid = false;
+      }
+
+      // Если выбрана карта - валидируем данные
+      if (paymentMethod === 'card') {
+        const cardNumber = document.getElementById('card-number').value.replace(/\s/g, '');
+        const cardExpiry = document.getElementById('card-expiry').value;
+        const cardCvc = document.getElementById('card-cvc').value;
+
+        if (!/^\d{16}$/.test(cardNumber)) {
+          document.getElementById('card-number').parentElement.classList.add('error');
+          document.getElementById('card-number-error').classList.add('show');
+          valid = false;
+        }
+
+        if (!/^\d{2}\/\d{2}$/.test(cardExpiry)) {
+          document.getElementById('card-expiry').parentElement.classList.add('error');
+          document.getElementById('card-expiry-error').classList.add('show');
+          valid = false;
+        }
+
+        if (!/^\d{3}$/.test(cardCvc)) {
+          document.getElementById('card-cvc').parentElement.classList.add('error');
+          document.getElementById('card-cvc-error').classList.add('show');
+          valid = false;
+        }
+      }
+
+      if (!valid) {
         return;
       }
       
