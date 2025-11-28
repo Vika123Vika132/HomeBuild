@@ -116,6 +116,7 @@ app.use(session({
 app.use((req, res, next) => {
   res.locals.user = req.session.user || null;
   res.locals.cart = req.session.cart || [];
+  res.locals.cartCount = (req.session.cart || []).reduce((sum, item) => sum + item.quantity, 0);
   next();
 });
 
@@ -214,7 +215,8 @@ app.post('/cart/add', (req, res) => {
     req.session.cart.push({ flowerId: parseInt(flowerId), quantity: parseInt(quantity) });
   }
   
-  res.json({ success: true, cartCount: req.session.cart.length });
+  const cartCount = req.session.cart.reduce((sum, item) => sum + item.quantity, 0);
+  res.json({ success: true, cartCount });
 });
 
 app.post('/cart/update', (req, res) => {
@@ -240,7 +242,8 @@ app.post('/cart/remove', (req, res) => {
   }
   
   req.session.cart = req.session.cart.filter(item => item.flowerId !== parseInt(flowerId));
-  res.json({ success: true, cartCount: req.session.cart.length });
+  const cartCount = req.session.cart.reduce((sum, item) => sum + item.quantity, 0);
+  res.json({ success: true, cartCount });
 });
 
 app.post('/order/create', (req, res) => {
