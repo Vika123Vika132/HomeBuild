@@ -319,6 +319,14 @@
       }
     });
 
+    document.getElementById('card-number').addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 16) {
+        value = value.substring(0, 16);
+      }
+      e.target.value = value;
+    });
+
     document.getElementById('card-expiry').addEventListener('input', function(e) {
       let value = e.target.value.replace(/\D/g, '');
       if (value.length > 2) {
