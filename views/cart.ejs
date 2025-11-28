@@ -335,6 +335,14 @@
       e.target.value = value;
     });
 
+    document.getElementById('card-cvc').addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 3) {
+        value = value.substring(0, 3);
+      }
+      e.target.value = value;
+    });
+
     async function confirmPayment() {
       const address = document.getElementById('address').value.trim();
       const date = document.getElementById('deliveryDate').value;
