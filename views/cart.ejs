@@ -319,6 +319,14 @@
       }
     });
 
+    document.getElementById('card-expiry').addEventListener('input', function(e) {
+      let value = e.target.value.replace(/\D/g, '');
+      if (value.length > 2) {
+        value = value.substring(0, 2) + '/' + value.substring(2, 4);
+      }
+      e.target.value = value;
+    });
+
     async function confirmPayment() {
       const address = document.getElementById('address').value.trim();
       const date = document.getElementById('deliveryDate').value;
