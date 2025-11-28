@@ -87,8 +87,8 @@
             <input type="number" id="add-stock" required min="0">
           </div>
           <div class="form-group">
-            <label for="add-image">URL изображения (необязательно)</label>
-            <input type="text" id="add-image">
+            <label for="add-image">Изображение</label>
+            <input type="file" id="add-image" accept="image/*">
           </div>
           <button type="submit" class="btn">Добавить</button>
         </form>
@@ -152,8 +152,8 @@
           <input type="number" id="edit-stock" required min="0">
         </div>
         <div class="form-group">
-          <label for="edit-image">URL изображения</label>
-          <input type="text" id="edit-image">
+          <label for="edit-image">Изображение (оставьте пустым, чтобы не менять)</label>
+          <input type="file" id="edit-image" accept="image/*">
         </div>
         <button type="submit" class="btn">Сохранить</button>
         <button type="button" class="btn btn-secondary" onclick="closeEditModal()" style="margin-left: 1rem;">Отмена</button>
@@ -188,13 +188,21 @@
       const description = document.getElementById('add-description').value;
       const price = document.getElementById('add-price').value;
       const stock = document.getElementById('add-stock').value;
-      const image_url = document.getElementById('add-image').value;
+      const imageFile = document.getElementById('add-image').files[0];
+      
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('description', description);
+      formData.append('price', price);
+      formData.append('stock', stock);
+      if (imageFile) {
+        formData.append('image', imageFile);
+      }
       
       try {
         const response = await fetch('/admin/flower/add', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, description, price, stock, image_url })
+          body: formData
         });
         
         const data = await response.json();
@@ -230,13 +238,22 @@
       const description = document.getElementById('edit-description').value;
       const price = document.getElementById('edit-price').value;
       const stock = document.getElementById('edit-stock').value;
-      const image_url = document.getElementById('edit-image').value;
+      const imageFile = document.getElementById('edit-image').files[0];
+      
+      const formData = new FormData();
+      formData.append('id', id);
+      formData.append('name', name);
+      formData.append('description', description);
+      formData.append('price', price);
+      formData.append('stock', stock);
+      if (imageFile) {
+        formData.append('image', imageFile);
+      }
       
       try {
         const response = await fetch('/admin/flower/update', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id, name, description, price, stock, image_url })
+          body: formData
         });
         
         const data = await response.json();
