@@ -22,7 +22,7 @@
     <section class="section">
       <div class="container">
         <h2 class="section-title">Популярные товары</h2>
-        <div class="grid">
+        <div class="grid products-grid">
           <% featuredFlowers.forEach(flower => { %>
             <div class="card" data-product-id="<%= flower.id %>" role="button" tabindex="0">
               <img src="<%= flower.image_url %>" alt="<%= flower.name %>">
@@ -43,7 +43,7 @@
     <section class="section" style="background-color: #ece9e4;">
       <div class="container">
         <h2 class="section-title">Почему выбирают HomeBuild</h2>
-        <div class="grid">
+        <div class="grid home-why-grid">
           <div class="info-section">
             <h2>Ассортимент</h2>
             <p>Сертифицированные материалы от производителей и оптовых складов</p>

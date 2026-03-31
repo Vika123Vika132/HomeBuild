@@ -33,6 +33,15 @@
     .catalog-search .btn { margin: 0; }
     .catalog-empty { text-align: center; padding: 3rem 1rem; color: #666; }
     .catalog-empty[hidden] { display: none !important; }
+    @media (max-width: 768px) {
+      .catalog-search input[type="search"] {
+        font-size: 0.82rem;
+        padding: 0.55rem 0.65rem;
+      }
+      .catalog-search {
+        min-width: 0;
+      }
+    }
   </style>
 </head>
 <body>
