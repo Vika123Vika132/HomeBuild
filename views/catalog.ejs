@@ -3,8 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Каталог - Florist</title>
+  <title>Каталог — HomeBuild</title>
   <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .catalog-toolbar {
+      max-width: 1200px;
+      margin: 0 auto 2rem;
+      padding: 0 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      justify-content: center;
+    }
+    .catalog-search {
+      display: flex;
+      flex: 1;
+      min-width: 240px;
+      max-width: 480px;
+      gap: 0.5rem;
+    }
+    .catalog-search input[type="search"] {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: 1px solid #dde2e5;
+      font-size: 1rem;
+      font-family: inherit;
+    }
+    .catalog-search .btn { margin: 0; }
+    .catalog-empty { text-align: center; padding: 3rem 1rem; color: #666; }
+    .catalog-empty[hidden] { display: none !important; }
+  </style>
 </head>
 <body>
   <%- include('partials/header') %>
@@ -12,21 +41,41 @@
   <main>
     <section class="section">
       <div class="container">
-        <h2 class="section-title">Каталог цветов</h2>
-        <div class="grid">
+        <h2 class="section-title">Каталог товаров</h2>
+
+        <div class="catalog-toolbar">
+          <form class="catalog-search" id="catalog-search-form" action="/catalog" method="get" role="search">
+            <input type="search" name="q" id="catalog-search-input" placeholder="Поиск по названию или описанию…" value="<%= searchQuery || '' %>" autocomplete="off">
+            <button type="submit" class="btn">Найти</button>
+          </form>
+        </div>
+
+        <% if (flowers.length === 0) { %>
+          <div class="catalog-empty">
+            <p style="font-size: 1.1rem; margin-bottom: 1rem;">В каталоге пока нет товаров.</p>
+          </div>
+        <% } else { %>
+        <div id="catalog-no-results" class="catalog-empty" hidden>
+          <p id="catalog-no-results-text" style="font-size: 1.1rem; margin-bottom: 1rem;"></p>
+          <button type="button" class="btn btn-secondary" id="catalog-clear-search">Сбросить поиск</button>
+        </div>
+        <div class="grid" id="catalog-grid">
           <% flowers.forEach(flower => { %>
-            <div class="card" onclick="openFlowerModal(<%= flower.id %>, '<%= flower.name %>', '<%= flower.description %>', <%= flower.price %>, '<%= flower.image_url %>', <%= flower.stock %>)">
+            <div class="card" data-product-id="<%= flower.id %>" role="button" tabindex="0">
               <img src="<%= flower.image_url %>" alt="<%= flower.name %>">
               <div class="card-content">
                 <h3><%= flower.name %></h3>
-                <p><%= flower.description %></p>
-                <div class="price"><%= flower.price %> ₽</div>
-                <p style="color: #999; font-size: 0.9rem;">В наличии: <%= flower.stock %> шт.</p>
-                <button class="btn btn-secondary" onclick="event.stopPropagation(); addQuickToCart(<%= flower.id %>);">Добавить в корзину</button>
+                <p class="card-desc"><%= flower.description %></p>
+                <div class="card-footer">
+                  <div class="price"><%= flower.price %> ₽</div>
+                  <p class="card-stock">В наличии: <%= flower.stock %> шт.</p>
+                  <button type="button" class="btn btn-secondary card-add-btn" data-product-id="<%= flower.id %>">Добавить в корзину</button>
+                </div>
               </div>
             </div>
           <% }) %>
         </div>
+        <% } %>
       </div>
     </section>
   </main>
@@ -44,30 +93,51 @@
           <div class="price" id="modal-price" style="font-size: 1.5rem; margin-bottom: 1rem;"></div>
           <p id="modal-stock" style="color: #999; margin-bottom: 1rem;"></p>
           <div class="quantity-selector">
-            <button onclick="decreaseModalQuantity()">−</button>
+            <button type="button" onclick="decreaseModalQuantity()">−</button>
             <input type="number" id="modal-quantity" value="1" min="1" readonly>
-            <button onclick="increaseModalQuantity()">+</button>
+            <button type="button" onclick="increaseModalQuantity()">+</button>
           </div>
-          <button class="btn" id="modal-add-btn" style="width: 100%;">Добавить в корзину</button>
+          <button type="button" class="btn" id="modal-add-btn" style="width: 100%;">Добавить в корзину</button>
         </div>
       </div>
     </div>
   </div>
 
   <script>
+    const catalogProducts = <%- JSON.stringify(flowers.map(f => ({
+      id: f.id,
+      name: f.name,
+      description: f.description,
+      price: f.price,
+      image_url: f.image_url,
+      stock: f.stock
+    }))) %>;
+
+    function normalizeSearchText(s) {
+      return (s || '').toLowerCase().replace(/ё/g, 'е').replace(/Ё/g, 'е');
+    }
+
+    function productMatchesQuery(p, rawNeedle) {
+      const needle = normalizeSearchText(rawNeedle).trim();
+      if (!needle) return true;
+      const hay = normalizeSearchText((p.name || '') + ' ' + (p.description || ''));
+      return hay.includes(needle);
+    }
+
     let currentFlowerId = null;
     let currentFlowerStock = 0;
+
+    function findProduct(id) {
+      return catalogProducts.find(p => p.id === id);
+    }
 
     async function addQuickToCart(flowerId) {
       try {
         const response = await fetch('/cart/add', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ flowerId, quantity: 1 })
         });
-        
         const data = await response.json();
         if (data.success) {
           const cartBadge = document.getElementById('cart-count');
@@ -78,57 +148,74 @@
       }
     }
 
-    function openFlowerModal(flowerId, name, description, price, image, stock) {
-      currentFlowerId = flowerId;
-      currentFlowerStock = stock;
-      document.getElementById('modal-name').textContent = name;
-      document.getElementById('modal-description').textContent = description;
-      document.getElementById('modal-price').textContent = price + ' ₽';
-      document.getElementById('modal-image').src = image;
-      document.getElementById('modal-stock').textContent = 'В наличии: ' + stock + ' шт.';
+    function openFlowerModalById(id) {
+      const p = findProduct(id);
+      if (!p) return;
+      currentFlowerId = p.id;
+      currentFlowerStock = p.stock;
+      document.getElementById('modal-name').textContent = p.name;
+      document.getElementById('modal-description').textContent = p.description;
+      document.getElementById('modal-price').textContent = p.price + ' ₽';
+      document.getElementById('modal-image').src = p.image_url;
+      document.getElementById('modal-image').alt = p.name;
+      document.getElementById('modal-stock').textContent = 'В наличии: ' + p.stock + ' шт.';
       document.getElementById('modal-quantity').value = 1;
-      document.getElementById('modal-quantity').max = stock;
+      document.getElementById('modal-quantity').max = p.stock;
       document.getElementById('flower-modal').style.display = 'flex';
-      
-      document.getElementById('modal-add-btn').onclick = function() {
-        addModalToCart();
-      };
+      document.getElementById('modal-add-btn').onclick = function() { addModalToCart(); };
     }
 
     function closeFlowerModal() {
       document.getElementById('flower-modal').style.display = 'none';
     }
 
+    document.querySelectorAll('.card[data-product-id]').forEach(card => {
+      const id = parseInt(card.getAttribute('data-product-id'), 10);
+      card.addEventListener('click', function(e) {
+        if (e.target.closest('.card-add-btn')) return;
+        openFlowerModalById(id);
+      });
+      card.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          if (!e.target.closest('.card-add-btn')) openFlowerModalById(id);
+        }
+      });
+    });
+
+    document.querySelectorAll('.card-add-btn').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const id = parseInt(btn.getAttribute('data-product-id'), 10);
+        addQuickToCart(id);
+      });
+    });
+
     function increaseModalQuantity() {
       const input = document.getElementById('modal-quantity');
-      if (parseInt(input.value) < currentFlowerStock) {
-        input.value = parseInt(input.value) + 1;
+      if (parseInt(input.value, 10) < currentFlowerStock) {
+        input.value = parseInt(input.value, 10) + 1;
       }
     }
 
     function decreaseModalQuantity() {
       const input = document.getElementById('modal-quantity');
-      if (parseInt(input.value) > 1) {
-        input.value = parseInt(input.value) - 1;
+      if (parseInt(input.value, 10) > 1) {
+        input.value = parseInt(input.value, 10) - 1;
       }
     }
 
     async function addModalToCart() {
-      const quantity = parseInt(document.getElementById('modal-quantity').value);
-      
+      const quantity = parseInt(document.getElementById('modal-quantity').value, 10);
       try {
         const response = await fetch('/cart/add', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ flowerId: currentFlowerId, quantity })
         });
-        
         const data = await response.json();
         if (data.success) {
-          const cartBadge = document.getElementById('cart-count');
-          cartBadge.textContent = data.cartCount;
+          document.getElementById('cart-count').textContent = data.cartCount;
           closeFlowerModal();
         }
       } catch (error) {
@@ -136,12 +223,81 @@
       }
     }
 
-    window.onclick = function(event) {
+    window.addEventListener('click', function(event) {
       const modal = document.getElementById('flower-modal');
-      if (event.target == modal) {
-        closeFlowerModal();
+      if (event.target === modal) closeFlowerModal();
+    });
+
+    (function initCatalogSearch() {
+      const form = document.getElementById('catalog-search-form');
+      const input = document.getElementById('catalog-search-input');
+      const grid = document.getElementById('catalog-grid');
+      const noResults = document.getElementById('catalog-no-results');
+      const noResultsText = document.getElementById('catalog-no-results-text');
+      const clearBtn = document.getElementById('catalog-clear-search');
+      if (!form || !input || !grid) return;
+
+      let debounceTimer = null;
+
+      function syncUrl(q) {
+        const url = new URL(window.location.href);
+        const trimmed = (q || '').trim();
+        if (trimmed) url.searchParams.set('q', trimmed);
+        else url.searchParams.delete('q');
+        const next = url.pathname + url.search + url.hash;
+        if (next !== window.location.pathname + window.location.search + window.location.hash) {
+          history.replaceState({}, '', next);
+        }
       }
-    }
+
+      function applyFilter() {
+        const q = input.value;
+        const needle = q.trim();
+        let visible = 0;
+        grid.querySelectorAll('.card[data-product-id]').forEach(function(card) {
+          const id = parseInt(card.getAttribute('data-product-id'), 10);
+          const p = findProduct(id);
+          const show = p && productMatchesQuery(p, q);
+          card.style.display = show ? '' : 'none';
+          if (show) visible++;
+        });
+        if (noResults && noResultsText) {
+          if (needle.length > 0 && visible === 0) {
+            noResults.hidden = false;
+            grid.style.display = 'none';
+            noResultsText.textContent = 'Ничего не найдено по запросу «' + needle + '».';
+          } else {
+            noResults.hidden = true;
+            grid.style.display = '';
+          }
+        }
+        syncUrl(q);
+      }
+
+      function scheduleApply() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(applyFilter, 200);
+      }
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        clearTimeout(debounceTimer);
+        applyFilter();
+      });
+
+      input.addEventListener('input', scheduleApply);
+
+      if (clearBtn) {
+        clearBtn.addEventListener('click', function() {
+          input.value = '';
+          clearTimeout(debounceTimer);
+          applyFilter();
+          input.focus();
+        });
+      }
+
+      applyFilter();
+    })();
   </script>
 </body>
 </html>

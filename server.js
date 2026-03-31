@@ -24,7 +24,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 const app = express();
-const db = new Database('florist.db');
+const db = new Database('homebuild.db');
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS users (
@@ -78,27 +78,36 @@ db.exec(`
 const adminExists = db.prepare('SELECT * FROM users WHERE role = ?').get('admin');
 if (!adminExists) {
   const hashedPassword = bcrypt.hashSync('admin123', 10);
-  db.prepare('INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)').run('admin', 'admin@florist.com', hashedPassword, 'admin');
+  db.prepare('INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)').run('admin', 'admin@homebuild.ru', hashedPassword, 'admin');
 }
 
-const flowersCount = db.prepare('SELECT COUNT(*) as count FROM flowers').get();
-if (flowersCount.count === 0) {
-  const flowers = [
-    { name: 'Роза белая', description: 'Элегантная белая роза, символ чистоты и нежности', price: 150, image_url: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300"%3E%3Crect fill="%23f5f5f5" width="300" height="300"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="%23333"%3EРоза белая%3C/text%3E%3C/svg%3E', stock: 50 },
-    { name: 'Тюльпан черный', description: 'Редкий черный тюльпан, изысканный и загадочный', price: 200, image_url: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300"%3E%3Crect fill="%23f5f5f5" width="300" height="300"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="%23333"%3EТюльпан%3C/text%3E%3C/svg%3E', stock: 30 },
-    { name: 'Лилия белая', description: 'Классическая белая лилия с нежным ароматом', price: 180, image_url: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300"%3E%3Crect fill="%23f5f5f5" width="300" height="300"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="%23333"%3EЛилия%3C/text%3E%3C/svg%3E', stock: 40 },
-    { name: 'Орхидея', description: 'Экзотическая орхидея, символ роскоши', price: 350, image_url: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300"%3E%3Crect fill="%23f5f5f5" width="300" height="300"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="%23333"%3EОрхидея%3C/text%3E%3C/svg%3E', stock: 20 },
-    { name: 'Пион белый', description: 'Пышный белый пион, символ благополучия', price: 220, image_url: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300"%3E%3Crect fill="%23f5f5f5" width="300" height="300"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="%23333"%3EПион%3C/text%3E%3C/svg%3E', stock: 35 },
-    { name: 'Гортензия', description: 'Объемная гортензия с нежными соцветиями', price: 280, image_url: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300"%3E%3Crect fill="%23f5f5f5" width="300" height="300"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="%23333"%3EГортензия%3C/text%3E%3C/svg%3E', stock: 25 },
-    { name: 'Каллы', description: 'Изящные каллы, элегантность в каждом изгибе', price: 250, image_url: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300"%3E%3Crect fill="%23f5f5f5" width="300" height="300"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="%23333"%3EКаллы%3C/text%3E%3C/svg%3E', stock: 30 },
-    { name: 'Хризантема', description: 'Классическая хризантема, долговечная красота', price: 120, image_url: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300"%3E%3Crect fill="%23f5f5f5" width="300" height="300"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="%23333"%3EХризантема%3C/text%3E%3C/svg%3E', stock: 60 }
-  ];
-  
-  const insertFlower = db.prepare('INSERT INTO flowers (name, description, price, image_url, stock) VALUES (?, ?, ?, ?, ?)');
-  for (const flower of flowers) {
-    insertFlower.run(flower.name, flower.description, flower.price, flower.image_url, flower.stock);
-  }
+const seedFlowers = [
+  { name: 'Цемент М500 D0, 50 кг', description: 'Портландцемент для бетона и кладки; морозостойкая смесь', price: 420, stock: 200 },
+  { name: 'Кирпич керамический полнотелый', description: '250×120×65 мм, прочность М150, для несущих стен и цоколя', price: 18, image_url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=600&fit=crop&q=80', stock: 12000 },
+  { name: 'Доска обрезная 50×200×6000', description: 'Хвоя, естественная влажность; для каркаса и опалубки', price: 1850, image_url: 'https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=600&h=600&fit=crop&q=80', stock: 80 },
+  { name: 'Гипсокартон 12,5 мм 1,2×2,5 м', description: 'Влагостойкий (Кнауф), для влажных зон и перегородок', price: 680, image_url: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&h=600&fit=crop&q=80', stock: 350 },
+  { name: 'Песок строительный, 1 м³', description: 'Мытый, средней крупности; для стяжек и кладочных растворов', price: 1200, image_url: 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=600&h=600&fit=crop&q=80', stock: 45 },
+  { name: 'Краска фасадная белая, 15 л', description: 'Акриловая, дышащая, УФ-стойкая; расход согласно инструкции', price: 5200, image_url: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=600&h=600&fit=crop&q=80', stock: 60 },
+  { name: 'Утеплитель минвата 100 мм', description: 'Плиты 1200×600; для фасада и перегородок, группа горючести НГ', price: 890, image_url: 'https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=600&h=600&fit=crop&q=80', stock: 400 },
+  { name: 'Перфоратор SDS-plus 800 Вт', description: '3 режима, в комплекте кейс; для демонтажа и сверления бетона', price: 8900, image_url: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=600&h=600&fit=crop&q=80', stock: 25 },
+  { name: 'Шпаклевка полимерная финишная, 25 кг', description: 'Для финишного выравнивания стен и потолков перед покраской', price: 950, image_url: 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&h=600&fit=crop&q=80', stock: 120 },
+  { name: 'Серпянка строительная 50 мм × 45 м', description: 'Для армирования швов при оштукатуривании и гипсокартоне', price: 240, image_url: 'https://images.unsplash.com/photo-1513467535987-fd81bc7d62f8?w=600&h=600&fit=crop&q=80', stock: 200 },
+  { name: 'Линолеум бытовой 2.5 м, толщина 3.5 мм', description: 'Полувинил на вспененной основе; подходит для кухни и коридора', price: 4200, image_url: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=600&h=600&fit=crop&q=80', stock: 35 },
+  { name: 'Розетка с заземлением, белая', description: 'Legrand Valena, 16 А, для скрытой установки', price: 320, image_url: 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&h=600&fit=crop&q=80', stock: 500 },
+  { name: 'Металлочерепица 0.45 мм, RAL 7024', description: 'Лист 1180×2200 мм; графитовый серый, полиэстер', price: 780, image_url: 'https://images.unsplash.com/photo-1541888946425-d81bb19240f5?w=600&h=600&fit=crop&q=80', stock: 150 },
+  { name: 'Перчатки х/б с латексным покрытием, 10 пар', description: 'Универсальные для строительных и погрузочных работ', price: 480, image_url: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=600&h=600&fit=crop&q=80', stock: 300 }
+];
+
+const insertFlowerIfMissing = db.prepare('INSERT INTO flowers (name, description, price, image_url, stock) SELECT ?, ?, ?, ?, ? WHERE NOT EXISTS (SELECT 1 FROM flowers WHERE name = ?)');
+for (const f of seedFlowers) {
+  insertFlowerIfMissing.run(f.name, f.description, f.price, f.image_url, f.stock, f.name);
 }
+
+db.exec(`
+  UPDATE flowers SET
+    name = replace(replace(name, 'ё', 'е'), 'Ё', 'Е'),
+    description = replace(replace(coalesce(description, ''), 'ё', 'е'), 'Ё', 'Е');
+`);
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -107,7 +116,7 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'florist-secret-key-2024',
+  secret: process.env.SESSION_SECRET || 'homebuild-session-secret-2026',
   resave: false,
   saveUninitialized: true,
   cookie: { maxAge: 24 * 60 * 60 * 1000, httpOnly: true }
@@ -127,6 +136,13 @@ function requireAdmin(req, res, next) {
   next();
 }
 
+function requireUser(req, res, next) {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+  next();
+}
+
 app.get('/', (req, res) => {
   const featuredFlowers = db.prepare('SELECT * FROM flowers LIMIT 3').all();
   res.render('index', { featuredFlowers });
@@ -134,7 +150,8 @@ app.get('/', (req, res) => {
 
 app.get('/catalog', (req, res) => {
   const flowers = db.prepare('SELECT * FROM flowers ORDER BY created_at DESC').all();
-  res.render('catalog', { flowers });
+  const searchQuery = (req.query.q || '').trim();
+  res.render('catalog', { flowers, searchQuery });
 });
 
 app.get('/product/:id', (req, res) => {
@@ -155,9 +172,57 @@ app.get('/contacts', (req, res) => {
 
 app.get('/login', (req, res) => {
   if (req.session.user) {
-    return res.redirect('/');
+    if (req.session.user.role === 'admin') {
+      return res.redirect('/admin');
+    }
+    return res.redirect('/account');
   }
   res.render('login', { error: null });
+});
+
+app.get('/account', requireUser, (req, res) => {
+  if (req.session.user.role === 'admin') {
+    return res.redirect('/admin');
+  }
+  const orders = db.prepare('SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC').all(req.session.user.id);
+  const accountMessage = req.query.message || null;
+  const accountError = req.query.error || null;
+  res.render('account', { orders, accountMessage, accountError });
+});
+
+app.post('/account/update', requireUser, async (req, res) => {
+  if (req.session.user.role === 'admin') {
+    return res.redirect('/admin');
+  }
+
+  const userId = req.session.user.id;
+  const username = (req.body.username || '').trim();
+  const email = (req.body.email || '').trim();
+  const password = (req.body.password || '').trim();
+
+  if (!username || !email) {
+    return res.redirect('/account?error=' + encodeURIComponent('Имя и email обязательны'));
+  }
+
+  const duplicate = db.prepare('SELECT id FROM users WHERE (username = ? OR email = ?) AND id != ?').get(username, email, userId);
+  if (duplicate) {
+    return res.redirect('/account?error=' + encodeURIComponent('Пользователь с таким именем или email уже существует'));
+  }
+
+  try {
+    if (password) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      db.prepare('UPDATE users SET username = ?, email = ?, password = ? WHERE id = ?').run(username, email, hashedPassword, userId);
+    } else {
+      db.prepare('UPDATE users SET username = ?, email = ? WHERE id = ?').run(username, email, userId);
+    }
+
+    req.session.user.username = username;
+    req.session.user.email = email;
+    return res.redirect('/account?message=' + encodeURIComponent('Данные профиля обновлены'));
+  } catch (error) {
+    return res.redirect('/account?error=' + encodeURIComponent('Не удалось обновить данные'));
+  }
 });
 
 app.post('/register', async (req, res) => {
@@ -286,7 +351,7 @@ app.get('/admin', requireAdmin, (req, res) => {
 
 app.post('/admin/flower/add', requireAdmin, upload.single('image'), (req, res) => {
   const { name, description, price, stock } = req.body;
-  let image_url = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300"%3E%3Crect fill="%23f5f5f5" width="300" height="300"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="20" fill="%23333"%3EНовый цветок%3C/text%3E%3C/svg%3E';
+  let image_url = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300"%3E%3Crect fill="%23222f3e" width="300" height="300"/%3E%3Ctext x="50%25" y="50%25" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="18" fill="%23e67e22"%3EHomeBuild%3C/text%3E%3C/svg%3E';
   
   if (req.file) {
     image_url = '/uploads/' + req.file.filename;
@@ -331,7 +396,107 @@ app.post('/admin/flower/delete', requireAdmin, (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 5000;
+app.post('/admin/order/status', requireAdmin, (req, res) => {
+  const { id, status } = req.body;
+  const allowed = ['pending', 'processing', 'shipped', 'delivered', 'cancelled'];
+  if (!allowed.includes(status)) {
+    return res.json({ success: false, error: 'Недопустимый статус' });
+  }
+  try {
+    db.prepare('UPDATE orders SET status = ? WHERE id = ?').run(status, parseInt(id, 10));
+    res.json({ success: true });
+  } catch (error) {
+    res.json({ success: false, error: 'Ошибка обновления заказа' });
+  }
+});
+
+function normalizeText(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/ё/g, 'е')
+    .trim();
+}
+
+app.post('/chatbot/reply', (req, res) => {
+  const message = String(req.body.message || '').trim();
+  if (!message) {
+    return res.json({ success: false, reply: 'Напишите вопрос, и я постараюсь помочь.' });
+  }
+
+  const q = normalizeText(message);
+  const user = req.session.user || null;
+  const cartCount = (req.session.cart || []).reduce((sum, item) => sum + item.quantity, 0);
+
+  if (q.includes('привет') || q.includes('здрав')) {
+    const namePart = user ? `, ${user.username}` : '';
+    return res.json({ success: true, reply: `Здравствуйте${namePart}! Могу подсказать по доставке, оплате, заказам и товарам.` });
+  }
+
+  if (q.includes('достав')) {
+    return res.json({ success: true, reply: 'Доставка по городу обычно 1-2 дня, по области - по согласованию с менеджером.' });
+  }
+
+  if (q.includes('самовывоз')) {
+    return res.json({ success: true, reply: 'Самовывоз доступен после подтверждения заказа. Детали отправим после оформления.' });
+  }
+
+  if (q.includes('оплат') || q.includes('карта') || q.includes('перевод')) {
+    return res.json({ success: true, reply: 'Оплата доступна онлайн при оформлении. Для юрлиц предоставляем закрывающие документы.' });
+  }
+
+  if (q.includes('корзин')) {
+    return res.json({ success: true, reply: cartCount > 0 ? `Сейчас в вашей корзине ${cartCount} шт. товаров.` : 'Ваша корзина сейчас пуста.' });
+  }
+
+  if (q.includes('заказ') || q.includes('статус')) {
+    if (!user) {
+      return res.json({ success: true, reply: 'Чтобы смотреть статусы заказов, войдите в аккаунт и откройте личный кабинет.' });
+    }
+    const lastOrder = db.prepare('SELECT id, status, created_at FROM orders WHERE user_id = ? ORDER BY created_at DESC LIMIT 1').get(user.id);
+    if (!lastOrder) {
+      return res.json({ success: true, reply: 'У вас пока нет заказов. Оформите первый заказ в каталоге.' });
+    }
+    const statusLabels = {
+      pending: 'ожидает подтверждения',
+      processing: 'в обработке',
+      shipped: 'отправлен',
+      delivered: 'доставлен',
+      cancelled: 'отменен'
+    };
+    const statusText = statusLabels[lastOrder.status] || lastOrder.status;
+    return res.json({ success: true, reply: `Последний заказ №${lastOrder.id}: ${statusText}. Подробности - в личном кабинете.` });
+  }
+
+  if (q.includes('товар') || q.includes('каталог') || q.includes('найд')) {
+    const words = q.split(/\s+/).filter(w => w.length >= 4);
+    for (const word of words) {
+      const match = db.prepare('SELECT name, price, stock FROM flowers WHERE lower(replace(name, "ё", "е")) LIKE ? LIMIT 1').get(`%${word}%`);
+      if (match) {
+        return res.json({
+          success: true,
+          reply: `Нашел: "${match.name}" - ${Number(match.price).toFixed(2)} ₽, в наличии ${match.stock} шт. Посмотрите в каталоге.`
+        });
+      }
+    }
+    return res.json({ success: true, reply: 'В каталоге много позиций. Напишите точнее, например: "цемент", "гипсокартон" или "утеплитель".' });
+  }
+
+  return res.json({
+    success: true,
+    reply: 'Я могу помочь по темам: доставка, оплата, корзина, статус заказа, поиск товара в каталоге.'
+  });
+});
+
+const ADMIN_EMAIL = 'admin@homebuild.ru';
+const ADMIN_PASSWORD = 'admin123';
+
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Сервер запущен на http://localhost:${PORT}`);
+  console.log('');
+  console.log('--- Администратор HomeBuild ---');
+  console.log(`  Email:    ${ADMIN_EMAIL}`);
+  console.log(`  Пароль:   ${ADMIN_PASSWORD}`);
+  console.log('-------------------------------');
+  console.log('');
 });

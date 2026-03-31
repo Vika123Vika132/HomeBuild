@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Админ-панель - Florist</title>
+  <title>Админ-панель — HomeBuild</title>
   <link rel="stylesheet" href="/css/style.css">
   <style>
     .admin-section {
@@ -52,6 +52,12 @@
       padding: 1rem;
       margin-bottom: 1rem;
     }
+    .order-status-select {
+      margin-left: 0.5rem;
+      min-width: 220px;
+      padding: 0.35rem 0.5rem;
+      font-size: 0.95rem;
+    }
   </style>
 </head>
 <body>
@@ -63,12 +69,12 @@
       <h2 class="section-title">Панель администратора</h2>
 
       <div class="admin-tabs">
-        <button class="admin-tab active" onclick="showAdminTab('flowers')">Управление цветами</button>
+        <button class="admin-tab active" onclick="showAdminTab('flowers')">Товары</button>
         <button class="admin-tab" onclick="showAdminTab('orders')">Заказы</button>
       </div>
 
       <div id="flowers-tab" class="admin-content active">
-        <h3 style="margin-bottom: 2rem; font-weight: 300; font-size: 1.5rem;">Добавить новый цветок</h3>
+        <h3 style="margin-bottom: 2rem; font-weight: 300; font-size: 1.5rem;">Добавить товар</h3>
         <form onsubmit="addFlower(event)" style="max-width: 600px; margin-bottom: 3rem; padding: 2rem; border: 1px solid #e8e8e8; border-radius: 8px;">
           <div class="form-group">
             <label for="add-name">Название</label>
@@ -93,7 +99,7 @@
           <button type="submit" class="btn">Добавить</button>
         </form>
 
-        <h3 style="margin-bottom: 2rem; font-weight: 300; font-size: 1.5rem;">Список цветов</h3>
+        <h3 style="margin-bottom: 2rem; font-weight: 300; font-size: 1.5rem;">Список товаров</h3>
         <div class="flower-list">
           <% flowers.forEach(flower => { %>
             <div class="flower-item" id="flower-<%= flower.id %>">
@@ -121,7 +127,16 @@
               <p>Сумма: <%= order.total_amount %> ₽</p>
               <p>Адрес: <%= order.delivery_address %></p>
               <p>Дата доставки: <%= order.delivery_date %></p>
-              <p>Статус: <%= order.status %></p>
+              <p>
+                <label for="status-<%= order.id %>">Статус:</label>
+                <select id="status-<%= order.id %>" class="order-status-select" data-order-id="<%= order.id %>">
+                  <option value="pending" <%= order.status === 'pending' ? 'selected' : '' %>>Ожидает подтверждения</option>
+                  <option value="processing" <%= order.status === 'processing' ? 'selected' : '' %>>В обработке</option>
+                  <option value="shipped" <%= order.status === 'shipped' ? 'selected' : '' %>>Отправлен</option>
+                  <option value="delivered" <%= order.status === 'delivered' ? 'selected' : '' %>>Доставлен</option>
+                  <option value="cancelled" <%= order.status === 'cancelled' ? 'selected' : '' %>>Отменен</option>
+                </select>
+              </p>
               <p>Создан: <%= new Date(order.created_at).toLocaleString('ru-RU') %></p>
             </div>
           <% }) %>
@@ -132,7 +147,7 @@
 
   <div id="edit-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center;">
     <div style="background: #fff; padding: 2rem; max-width: 600px; width: 90%; border: 2px solid #000;">
-      <h3 style="margin-bottom: 2rem; font-weight: 300;">Редактировать цветок</h3>
+      <h3 style="margin-bottom: 2rem; font-weight: 300;">Редактировать товар</h3>
       <form onsubmit="updateFlower(event)">
         <input type="hidden" id="edit-id">
         <div class="form-group">
@@ -211,7 +226,7 @@
           location.reload();
         }
       } catch (error) {
-        // Ошибка при добавлении цветка
+        // Ошибка при добавлении товара
       }
     }
 
@@ -262,7 +277,7 @@
           location.reload();
         }
       } catch (error) {
-        // Ошибка при обновлении цветка
+        // Ошибка при обновлении товара
       }
     }
 
@@ -280,9 +295,29 @@
           location.reload();
         }
       } catch (error) {
-        // Ошибка при удалении цветка
+        // Ошибка при удалении товара
       }
     }
+
+    document.querySelectorAll('.order-status-select').forEach(function (sel) {
+      sel.addEventListener('change', async function () {
+        const id = this.getAttribute('data-order-id');
+        const status = this.value;
+        try {
+          const response = await fetch('/admin/order/status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, status })
+          });
+          const data = await response.json();
+          if (!data.success) {
+            alert('Не удалось сохранить статус');
+          }
+        } catch (e) {
+          alert('Ошибка сети');
+        }
+      });
+    });
   </script>
 </body>
 </html>

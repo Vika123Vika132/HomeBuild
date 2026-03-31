@@ -1,5 +1,131 @@
 <footer>
   <div class="container">
-    <p>&copy; 2024 FLORIST. Все права защищены.</p>
+    <p>&copy; 2026 HomeBuild. Все права защищены.</p>
   </div>
 </footer>
+
+<button type="button" id="scroll-top" class="scroll-top" aria-label="Наверх" title="Наверх">↑</button>
+<button type="button" id="chat-toggle" class="chat-toggle" aria-label="Открыть чат" title="Чат">
+  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d="M4 5.5h16a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3v-3H4A1.5 1.5 0 0 1 2.5 15V7A1.5 1.5 0 0 1 4 5.5Z"></path>
+  </svg>
+</button>
+
+<div id="chat-widget" class="chat-widget" aria-hidden="true">
+  <div class="chat-widget__header">
+    <strong>Чат-бот HomeBuild</strong>
+    <button type="button" id="chat-close" class="chat-widget__close" aria-label="Закрыть чат">&times;</button>
+  </div>
+  <div id="chat-messages" class="chat-widget__messages">
+    <div class="chat-msg chat-msg--bot">Здравствуйте! Я подскажу по доставке, оплате, заказам и каталогу.</div>
+  </div>
+  <form id="chat-form" class="chat-widget__form">
+    <input id="chat-input" type="text" placeholder="Ваш вопрос..." maxlength="250" autocomplete="off" required>
+    <button type="submit" class="btn">Отправить</button>
+  </form>
+</div>
+
+<script>
+  (function () {
+    const btn = document.getElementById('scroll-top');
+    if (btn) {
+      function toggle() {
+        btn.classList.toggle('scroll-top--visible', window.scrollY > 320);
+      }
+      window.addEventListener('scroll', toggle, { passive: true });
+      toggle();
+      btn.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+
+    const chatToggle = document.getElementById('chat-toggle');
+    const chatWidget = document.getElementById('chat-widget');
+    const chatClose = document.getElementById('chat-close');
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+    const chatMessages = document.getElementById('chat-messages');
+
+    if (!chatToggle || !chatWidget || !chatClose || !chatForm || !chatInput || !chatMessages) {
+      return;
+    }
+
+    function appendMessage(text, fromBot) {
+      const div = document.createElement('div');
+      div.className = fromBot ? 'chat-msg chat-msg--bot' : 'chat-msg chat-msg--user';
+      div.textContent = text;
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function getLocalFallbackReply(input) {
+      const q = input.toLowerCase();
+      if (q.includes('достав')) return 'Доставка по городу обычно 1-2 дня, по области - по согласованию.';
+      if (q.includes('оплат')) return 'Оплата доступна онлайн при оформлении заказа.';
+      if (q.includes('заказ') || q.includes('статус')) return 'Проверить статус можно в личном кабинете.';
+      if (q.includes('корзин')) return 'Проверьте корзину в верхнем меню: там все выбранные товары.';
+      if (q.includes('каталог') || q.includes('товар')) return 'Откройте каталог, выберите товар и добавьте его в корзину.';
+      return 'Могу подсказать по доставке, оплате, заказам, корзине и каталогу.';
+    }
+
+    function openChat() {
+      chatWidget.classList.add('chat-widget--open');
+      chatWidget.setAttribute('aria-hidden', 'false');
+      chatInput.focus();
+    }
+
+    function closeChat() {
+      chatWidget.classList.remove('chat-widget--open');
+      chatWidget.setAttribute('aria-hidden', 'true');
+    }
+
+    chatToggle.addEventListener('click', function () {
+      if (chatWidget.classList.contains('chat-widget--open')) {
+        closeChat();
+      } else {
+        openChat();
+      }
+    });
+
+    chatClose.addEventListener('click', closeChat);
+
+    chatForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const value = chatInput.value.trim();
+      if (!value) return;
+      appendMessage(value, false);
+      chatInput.value = '';
+      appendMessage('Печатает...', true);
+
+      fetch('/chatbot/reply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: value })
+      })
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error('bad status');
+          }
+          return response.json();
+        })
+        .then(function (data) {
+          const typingMsg = chatMessages.querySelector('.chat-msg--bot:last-child');
+          if (typingMsg && typingMsg.textContent === 'Печатает...') {
+            typingMsg.remove();
+          }
+          if (data && data.reply) {
+            appendMessage(data.reply, true);
+          } else {
+            appendMessage('Не удалось получить ответ. Попробуйте еще раз.', true);
+          }
+        })
+        .catch(function () {
+          const typingMsg = chatMessages.querySelector('.chat-msg--bot:last-child');
+          if (typingMsg && typingMsg.textContent === 'Печатает...') {
+            typingMsg.remove();
+          }
+          appendMessage(getLocalFallbackReply(value), true);
+        });
+    });
+  })();
+</script>

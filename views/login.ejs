@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Вход - Florist</title>
+  <title>Вход — HomeBuild</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -19,6 +19,7 @@
             <button class="auth-tab active" onclick="showTab('login')">Вход</button>
             <button class="auth-tab" onclick="showTab('register')">Регистрация</button>
           </div>
+          
 
           <div id="error-message" class="error-message"></div>
           <div id="success-message" class="success-message"></div>
@@ -26,7 +27,7 @@
           <form id="login-form" class="auth-form active" onsubmit="handleLogin(event)">
             <div class="form-group">
               <label for="login-email">Email</label>
-              <input type="email" id="login-email" required placeholder="Введите email">
+              <input type="text" id="login-email" name="email" inputmode="email" autocomplete="email" required placeholder="name@example.com" title="Укажите адрес латиницей, обязательно с символом @" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}">
             </div>
             <div class="form-group">
               <label for="login-password">Пароль</label>
@@ -42,7 +43,7 @@
             </div>
             <div class="form-group">
               <label for="register-email">Email</label>
-              <input type="email" id="register-email" required placeholder="Введите email">
+              <input type="text" id="register-email" name="email" inputmode="email" autocomplete="email" required placeholder="name@example.com" title="Укажите адрес латиницей, обязательно с символом @" pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}">
             </div>
             <div class="form-group">
               <label for="register-password">Пароль</label>
@@ -104,6 +105,11 @@
 
     async function handleLogin(event) {
       event.preventDefault();
+      const form = document.getElementById('login-form');
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
       hideMessages();
       
       const email = document.getElementById('login-email').value;
@@ -124,7 +130,7 @@
           if (data.role === 'admin') {
             window.location.href = '/admin';
           } else {
-            window.location.href = '/';
+            window.location.href = '/account';
           }
         } else {
           showError(data.error || 'Ошибка входа');
@@ -136,6 +142,11 @@
 
     async function handleRegister(event) {
       event.preventDefault();
+      const form = document.getElementById('register-form');
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
       hideMessages();
       
       const username = document.getElementById('register-username').value;

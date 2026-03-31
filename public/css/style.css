@@ -5,10 +5,10 @@
 }
 
 body {
-  font-family: 'Arial', sans-serif;
+  font-family: 'Segoe UI', Arial, sans-serif;
   line-height: 1.6;
-  color: #000;
-  background-color: #fff;
+  color: #1a1a1a;
+  background-color: #f7f6f4;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -19,13 +19,13 @@ main {
 }
 
 header {
-  background-color: #000;
+  background-color: #1c2833;
   color: #fff;
   padding: 1rem 0;
   position: sticky;
   top: 0;
   z-index: 1000;
-  border-bottom: 1px solid #fff;
+  border-bottom: 3px solid #e67e22;
 }
 
 .container {
@@ -45,7 +45,7 @@ header {
 .logo {
   font-size: 1.8rem;
   font-weight: bold;
-  letter-spacing: 2px;
+  letter-spacing: 1px;
   text-decoration: none;
   color: #fff;
 }
@@ -69,8 +69,8 @@ nav a:hover {
 }
 
 .cart-badge {
-  background-color: #fff;
-  color: #000;
+  background-color: #e67e22;
+  color: #fff;
   border-radius: 50%;
   width: 1.2rem;
   height: 1.2rem;
@@ -135,50 +135,53 @@ nav a:hover {
   position: relative;
   z-index: 2;
   text-align: center;
-  background-color: rgba(255, 255, 255, 0.9);
+  background-color: rgba(28, 40, 51, 0.88);
   padding: 3rem 2rem;
   max-width: 600px;
+  border: 1px solid rgba(230, 126, 34, 0.5);
 }
 
 .hero h1 {
   font-size: 3rem;
   margin-bottom: 1rem;
   font-weight: 300;
-  letter-spacing: 3px;
+  letter-spacing: 2px;
+  color: #fff;
 }
 
 .hero p {
   font-size: 1.2rem;
-  color: #666;
+  color: #e0e6ea;
   margin-bottom: 2rem;
 }
 
 .btn {
   display: inline-block;
   padding: 0.8rem 2rem;
-  background-color: #000;
+  background-color: #e67e22;
   color: #fff;
   text-decoration: none;
-  border: 2px solid #e8e8e8;
+  border: 2px solid #d35400;
   transition: all 0.3s;
   cursor: pointer;
   font-size: 1rem;
 }
 
 .btn:hover {
-  background-color: #fff;
-  color: #000;
+  background-color: #d35400;
+  color: #fff;
 }
 
 .btn-secondary {
   background-color: #fff;
-  color: #000;
-  border: 2px solid #e8e8e8;
+  color: #1c2833;
+  border: 2px solid #cfd8dc;
 }
 
 .btn-secondary:hover {
-  background-color: #000;
+  background-color: #1c2833;
   color: #fff;
+  border-color: #1c2833;
 }
 
 .section {
@@ -200,12 +203,15 @@ nav a:hover {
 }
 
 .card {
-  border: 1px solid #e8e8e8;
+  border: 1px solid #dde2e5;
   overflow: hidden;
   transition: transform 0.3s;
   background-color: #fff;
   cursor: pointer;
   border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .card:hover {
@@ -214,7 +220,7 @@ nav a:hover {
 
 .card img {
   width: 100%;
-  height: 250px;
+  height: 450px;
   object-fit: cover;
   background-color: #f5f5f5;
   display: block;
@@ -224,10 +230,8 @@ nav a:hover {
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
-}
-
-.card-content .btn {
-  align-self: center;
+  flex: 1;
+  min-height: 0;
 }
 
 .card h3 {
@@ -236,16 +240,37 @@ nav a:hover {
   font-weight: 400;
 }
 
-.card p {
+.card-desc {
   color: #666;
-  margin-bottom: 1rem;
+  margin-bottom: 0;
   font-size: 0.9rem;
+  flex: 1 1 auto;
+  min-height: 2.7rem;
 }
 
 .card .price {
   font-size: 1.2rem;
   font-weight: bold;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.card-stock {
+  color: #999;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+}
+
+.card-footer {
+  margin-top: auto;
+  padding-top: 0.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+}
+
+.card-footer .btn {
+  align-self: center;
 }
 
 .modal {
@@ -358,8 +383,9 @@ nav a:hover {
 }
 
 .quantity-selector button:hover {
-  background-color: #000;
+  background-color: #e67e22;
   color: #fff;
+  border-color: #e67e22;
 }
 
 .quantity-selector input {
@@ -454,7 +480,7 @@ nav a:hover {
 }
 
 .remove-btn:hover {
-  background-color: #000;
+  background-color: #1c2833;
   color: #fff;
 }
 
@@ -532,7 +558,7 @@ nav a:hover {
 }
 
 .auth-tab.active {
-  background-color: #000;
+  background-color: #1c2833;
   color: #fff;
 }
 
@@ -592,13 +618,212 @@ nav a:hover {
   margin-right: 0.5rem;
 }
 
+.faq-wrap {
+  max-width: 900px;
+}
+
+.faq-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.faq-item {
+  background: #fff;
+  border: 1px solid #dde2e5;
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+}
+
+.faq-item summary {
+  cursor: pointer;
+  font-weight: 500;
+  list-style: none;
+  position: relative;
+  padding-right: 1.25rem;
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item summary::after {
+  content: "+";
+  position: absolute;
+  right: 0;
+  top: 0;
+  color: #e67e22;
+  font-weight: bold;
+}
+
+.faq-item[open] summary::after {
+  content: "−";
+}
+
+.faq-item p {
+  margin-top: 0.6rem;
+  color: #666;
+}
+
+.scroll-top {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 5rem;
+  z-index: 1500;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid #d35400;
+  background: #e67e22;
+  color: #fff;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(12px);
+  transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease;
+}
+
+.scroll-top--visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.scroll-top:hover {
+  background: #d35400;
+}
+
+.chat-toggle {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 1510;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid #d35400;
+  background: #e67e22;
+  color: #fff;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  transition: background 0.25s ease;
+}
+
+.chat-toggle:hover {
+  background: #d35400;
+}
+
+.chat-toggle svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+  margin: 0 auto;
+}
+
+.chat-toggle svg path {
+  fill: transparent;
+  stroke: #fff;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chat-widget {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 5.2rem;
+  width: min(360px, calc(100vw - 2rem));
+  background: #fff;
+  border: 1px solid #dde2e5;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  z-index: 1515;
+  display: none;
+  overflow: hidden;
+}
+
+.chat-widget--open {
+  display: block;
+}
+
+.chat-widget__header {
+  background: #1c2833;
+  color: #fff;
+  padding: 0.75rem 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-widget__close {
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 1.4rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.chat-widget__messages {
+  padding: 0.75rem;
+  max-height: 280px;
+  overflow-y: auto;
+  background: #f7f6f4;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.chat-msg {
+  padding: 0.55rem 0.7rem;
+  border-radius: 8px;
+  max-width: 90%;
+  font-size: 0.95rem;
+}
+
+.chat-msg--bot {
+  background: #fff;
+  border: 1px solid #dde2e5;
+  align-self: flex-start;
+}
+
+.chat-msg--user {
+  background: #e67e22;
+  color: #fff;
+  align-self: flex-end;
+}
+
+.chat-widget__form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-top: 1px solid #e8e8e8;
+}
+
+.chat-widget__form input {
+  border: 1px solid #dde2e5;
+  border-radius: 8px;
+  padding: 0.65rem 0.7rem;
+  font-size: 0.95rem;
+}
+
+.chat-widget__form .btn {
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+}
+
 footer {
-  background-color: #000;
+  background-color: #1c2833;
   color: #fff;
   padding: 2rem 0;
   text-align: center;
   margin-top: 4rem;
-  border-top: 1px solid #fff;
+  border-top: 3px solid #e67e22;
 }
 
 .remove-btn {
@@ -611,7 +836,7 @@ footer {
 }
 
 .remove-btn:hover {
-  background-color: #000;
+  background-color: #1c2833;
   color: #fff;
 }
 
@@ -625,7 +850,7 @@ footer {
     top: 100%;
     left: 0;
     width: 100%;
-    background-color: #000;
+    background-color: #1c2833;
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease;

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Личный кабинет — HomeBuild</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .account-wrap { max-width: 900px; margin: 0 auto; }
+    .account-grid { display: grid; gap: 2rem; }
+    .orders-section { margin-top: 2.25rem; }
+    .orders-section h3 { font-weight: 400; margin-bottom: 1rem; }
+    .orders-list { display: grid; gap: 1.25rem; }
+    .profile-card {
+      border: 1px solid #dde2e5;
+      border-radius: 8px;
+      background: #fff;
+      padding: 1.5rem;
+    }
+    .profile-card h3 { font-weight: 400; margin-bottom: 1rem; }
+    .profile-note { color: #666; font-size: 0.95rem; margin-top: -0.5rem; margin-bottom: 1rem; }
+    .account-alert {
+      padding: 0.8rem 1rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+      border: 1px solid transparent;
+    }
+    .account-alert--success { background: #e8f5e9; border-color: #a5d6a7; color: #1b5e20; }
+    .account-alert--error { background: #ffebee; border-color: #ef9a9a; color: #b71c1c; }
+    .order-card {
+      border: 1px solid #dde2e5;
+      border-radius: 8px;
+      padding: 1.5rem;
+      background: #fff;
+    }
+    .order-card h3 { font-weight: 400; margin-bottom: 0.75rem; font-size: 1.15rem; }
+    .order-meta { color: #666; font-size: 0.95rem; line-height: 1.7; }
+    .status-badge {
+      display: inline-block;
+      padding: 0.35rem 0.75rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      margin-top: 0.75rem;
+      background: #ece9e4;
+      color: #1c2833;
+      border: 1px solid #cfd8dc;
+    }
+    .status-pending { background: #fff8e1; border-color: #ffe082; }
+    .status-processing { background: #e3f2fd; border-color: #90caf9; }
+    .status-shipped { background: #e8f5e9; border-color: #a5d6a7; }
+    .status-delivered { background: #e8f5e9; border-color: #43a047; color: #1b5e20; }
+    .status-cancelled { background: #ffebee; border-color: #ef9a9a; }
+    .empty-orders { text-align: center; padding: 3rem 1rem; color: #666; }
+  </style>
+</head>
+<body>
+  <%- include('partials/header') %>
+
+  <main>
+    <section class="section">
+      <div class="container account-wrap">
+        <h2 class="section-title">Личный кабинет</h2>
+        <% const safeAccountMessage = typeof accountMessage !== 'undefined' ? accountMessage : null; %>
+        <% const safeAccountError = typeof accountError !== 'undefined' ? accountError : null; %>
+        <p style="text-align: center; color: #666; margin-bottom: 2rem;">Здравствуйте, <%= user.username %>.</p>
+
+        <% if (safeAccountMessage) { %>
+          <div class="account-alert account-alert--success"><%= safeAccountMessage %></div>
+        <% } %>
+        <% if (safeAccountError) { %>
+          <div class="account-alert account-alert--error"><%= safeAccountError %></div>
+        <% } %>
+
+        <div class="account-grid">
+          <div class="profile-card">
+            <h3>Личные данные</h3>
+            <p class="profile-note">Здесь можно изменить имя, email и пароль.</p>
+            <form action="/account/update" method="POST">
+              <div class="form-group">
+                <label for="username">Имя пользователя</label>
+                <input id="username" name="username" type="text" required value="<%= user.username %>">
+              </div>
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" required value="<%= user.email %>">
+              </div>
+              <div class="form-group">
+                <label for="password">Новый пароль (необязательно)</label>
+                <input id="password" name="password" type="password" minlength="6" placeholder="Оставьте пустым, если не меняете">
+              </div>
+              <button type="submit" class="btn">Сохранить изменения</button>
+            </form>
+          </div>
+        </div>
+
+        <% const statusLabels = {
+          pending: 'Ожидает подтверждения',
+          processing: 'В обработке',
+          shipped: 'Отправлен',
+          delivered: 'Доставлен',
+          cancelled: 'Отменен'
+        }; %>
+
+        <div class="orders-section">
+          <h3>Мои заказы</h3>
+          <% if (orders.length === 0) { %>
+            <div class="empty-orders">
+              <p style="font-size: 1.1rem; margin-bottom: 1.5rem;">У вас пока нет заказов.</p>
+              <a href="/catalog" class="btn">Перейти в каталог</a>
+            </div>
+          <% } else { %>
+            <div class="orders-list">
+              <% orders.forEach(order => { %>
+                <% const label = statusLabels[order.status] || order.status; %>
+                <% const cls = 'status-' + (order.status || 'pending'); %>
+                <div class="order-card">
+                  <h3>Заказ №<%= order.id %></h3>
+                  <div class="order-meta">
+                    <p><strong>Сумма:</strong> <%= Number(order.total_amount).toFixed(2) %> ₽</p>
+                    <p><strong>Адрес доставки:</strong> <%= order.delivery_address %></p>
+                    <p><strong>Дата доставки:</strong> <%= order.delivery_date || '—' %></p>
+                    <p><strong>Оформлен:</strong> <%= new Date(order.created_at).toLocaleString('ru-RU') %></p>
+                  </div>
+                  <span class="status-badge <%= cls %>"><%= label %></span>
+                </div>
+              <% }) %>
+            </div>
+          <% } %>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <%- include('partials/footer') %>
+</body>
+</html>

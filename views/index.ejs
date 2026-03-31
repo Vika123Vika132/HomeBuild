@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Florist - Магазин цветов</title>
+  <title>HomeBuild — строительные материалы</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
@@ -11,26 +11,28 @@
 
   <main>
     <section class="hero">
-      <img src="/images/hero-banner.png" alt="Hero Banner" class="hero-image">
+      <img src="/image/banner.png" alt="Строительные материалы HomeBuild" class="hero-image">
       <div class="hero-content">
-        <h1>FLORIST</h1>
-        <p>Минималистичная элегантность в каждом букете</p>
+        <h1>HomeBuild</h1>
+        <p>Все для стройки и ремонта: от фундамента до отделки</p>
         <a href="/catalog" class="btn">Смотреть каталог</a>
       </div>
     </section>
 
     <section class="section">
       <div class="container">
-        <h2 class="section-title">Избранные цветы</h2>
+        <h2 class="section-title">Популярные товары</h2>
         <div class="grid">
           <% featuredFlowers.forEach(flower => { %>
-            <div class="card" onclick="openFlowerModal(<%= flower.id %>, '<%= flower.name %>', '<%= flower.description %>', <%= flower.price %>, '<%= flower.image_url %>', <%= flower.stock %>)">
+            <div class="card" data-product-id="<%= flower.id %>" role="button" tabindex="0">
               <img src="<%= flower.image_url %>" alt="<%= flower.name %>">
               <div class="card-content">
                 <h3><%= flower.name %></h3>
-                <p><%= flower.description %></p>
-                <div class="price"><%= flower.price %> ₽</div>
-                <button class="btn btn-secondary" onclick="event.stopPropagation(); addQuickToCart(<%= flower.id %>);">Добавить в корзину</button>
+                <p class="card-desc"><%= flower.description %></p>
+                <div class="card-footer">
+                  <div class="price"><%= flower.price %> ₽</div>
+                  <button type="button" class="btn btn-secondary card-add-btn" data-product-id="<%= flower.id %>">Добавить в корзину</button>
+                </div>
               </div>
             </div>
           <% }) %>
@@ -38,22 +40,50 @@
       </div>
     </section>
 
-    <section class="section" style="background-color: #f9f9f9;">
+    <section class="section" style="background-color: #ece9e4;">
       <div class="container">
-        <h2 class="section-title">Почему выбирают нас</h2>
+        <h2 class="section-title">Почему выбирают HomeBuild</h2>
         <div class="grid">
           <div class="info-section">
-            <h2>Качество</h2>
-            <p>Только свежие цветы от проверенных поставщиков</p>
+            <h2>Ассортимент</h2>
+            <p>Сертифицированные материалы от производителей и оптовых складов</p>
           </div>
           <div class="info-section">
             <h2>Доставка</h2>
-            <p>Быстрая и бережная доставка по всему городу</p>
+            <p>Привезем заказ на объект или до подъезда — по городу и области</p>
           </div>
           <div class="info-section">
-            <h2>Индивидуальность</h2>
-            <p>Каждый букет создается с вниманием к деталям</p>
+            <h2>Для профи и частников</h2>
+            <p>Поможем с расчетом объема и подбором аналогов под бюджет</p>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container faq-wrap">
+        <h2 class="section-title">Частые вопросы</h2>
+        <div class="faq-list">
+          <details class="faq-item">
+            <summary>Как быстро вы доставляете заказ?</summary>
+            <p>По городу обычно доставляем в течение 1-2 дней. По области сроки зависят от удаленности и согласуются при оформлении.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Можно ли заказать материалы с подъемом?</summary>
+            <p>Да, при оформлении укажите это в комментарии или сообщите менеджеру. Мы добавим услугу подъема в заказ.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Есть ли самовывоз со склада?</summary>
+            <p>Да, доступен самовывоз. После подтверждения заказа мы отправим адрес склада и время выдачи.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Можно ли изменить дату доставки после оплаты?</summary>
+            <p>Да, если заказ еще не отгружен. Напишите в поддержку или воспользуйтесь чат-ботом, и мы поможем перенести дату.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Вы работаете с юридическими лицами?</summary>
+            <p>Да, работаем с физическими и юридическими лицами, предоставляем закрывающие документы.</p>
+          </details>
         </div>
       </div>
     </section>
@@ -72,9 +102,9 @@
           <div class="price" id="modal-price" style="font-size: 1.5rem; margin-bottom: 1rem;"></div>
           <p id="modal-stock" style="color: #999; margin-bottom: 1rem;"></p>
           <div class="quantity-selector">
-            <button onclick="decreaseModalQuantity()">−</button>
+            <button type="button" onclick="decreaseModalQuantity()">−</button>
             <input type="number" id="modal-quantity" value="1" min="1" readonly>
-            <button onclick="increaseModalQuantity()">+</button>
+            <button type="button" onclick="increaseModalQuantity()">+</button>
           </div>
           <button class="btn" id="modal-add-btn" style="width: 100%;">Добавить в корзину</button>
         </div>
@@ -83,45 +113,75 @@
   </div>
 
   <script>
+    const featuredProducts = <%- JSON.stringify(featuredFlowers.map(f => ({
+      id: f.id,
+      name: f.name,
+      description: f.description,
+      price: f.price,
+      image_url: f.image_url,
+      stock: f.stock
+    }))) %>;
+
     let currentFlowerId = null;
     let currentFlowerStock = 0;
+
+    function findFeatured(id) {
+      return featuredProducts.find(p => p.id === id);
+    }
 
     async function addQuickToCart(flowerId) {
       try {
         const response = await fetch('/cart/add', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ flowerId, quantity: 1 })
         });
-        
         const data = await response.json();
         if (data.success) {
-          const cartBadge = document.getElementById('cart-count');
-          cartBadge.textContent = data.cartCount;
+          document.getElementById('cart-count').textContent = data.cartCount;
         }
       } catch (error) {
         console.error('Ошибка при добавлении в корзину');
       }
     }
 
-    function openFlowerModal(flowerId, name, description, price, image, stock) {
-      currentFlowerId = flowerId;
-      currentFlowerStock = stock;
-      document.getElementById('modal-name').textContent = name;
-      document.getElementById('modal-description').textContent = description;
-      document.getElementById('modal-price').textContent = price + ' ₽';
-      document.getElementById('modal-image').src = image;
-      document.getElementById('modal-stock').textContent = 'В наличии: ' + stock + ' шт.';
+    function openFlowerModalById(id) {
+      const p = findFeatured(id);
+      if (!p) return;
+      currentFlowerId = p.id;
+      currentFlowerStock = p.stock;
+      document.getElementById('modal-name').textContent = p.name;
+      document.getElementById('modal-description').textContent = p.description;
+      document.getElementById('modal-price').textContent = p.price + ' ₽';
+      document.getElementById('modal-image').src = p.image_url;
+      document.getElementById('modal-image').alt = p.name;
+      document.getElementById('modal-stock').textContent = 'В наличии: ' + p.stock + ' шт.';
       document.getElementById('modal-quantity').value = 1;
-      document.getElementById('modal-quantity').max = stock;
+      document.getElementById('modal-quantity').max = p.stock;
       document.getElementById('flower-modal').style.display = 'flex';
-      
-      document.getElementById('modal-add-btn').onclick = function() {
-        addModalToCart();
-      };
+      document.getElementById('modal-add-btn').onclick = function() { addModalToCart(); };
     }
+
+    document.querySelectorAll('.card[data-product-id]').forEach(card => {
+      const id = parseInt(card.getAttribute('data-product-id'), 10);
+      card.addEventListener('click', function(e) {
+        if (e.target.closest('.card-add-btn')) return;
+        openFlowerModalById(id);
+      });
+      card.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          if (!e.target.closest('.card-add-btn')) openFlowerModalById(id);
+        }
+      });
+    });
+
+    document.querySelectorAll('.card-add-btn').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        addQuickToCart(parseInt(btn.getAttribute('data-product-id'), 10));
+      });
+    });
 
     function closeFlowerModal() {
       document.getElementById('flower-modal').style.display = 'none';
@@ -129,34 +189,29 @@
 
     function increaseModalQuantity() {
       const input = document.getElementById('modal-quantity');
-      if (parseInt(input.value) < currentFlowerStock) {
-        input.value = parseInt(input.value) + 1;
+      if (parseInt(input.value, 10) < currentFlowerStock) {
+        input.value = parseInt(input.value, 10) + 1;
       }
     }
 
     function decreaseModalQuantity() {
       const input = document.getElementById('modal-quantity');
-      if (parseInt(input.value) > 1) {
-        input.value = parseInt(input.value) - 1;
+      if (parseInt(input.value, 10) > 1) {
+        input.value = parseInt(input.value, 10) - 1;
       }
     }
 
     async function addModalToCart() {
-      const quantity = parseInt(document.getElementById('modal-quantity').value);
-      
+      const quantity = parseInt(document.getElementById('modal-quantity').value, 10);
       try {
         const response = await fetch('/cart/add', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ flowerId: currentFlowerId, quantity })
         });
-        
         const data = await response.json();
         if (data.success) {
-          const cartBadge = document.getElementById('cart-count');
-          cartBadge.textContent = data.cartCount;
+          document.getElementById('cart-count').textContent = data.cartCount;
           closeFlowerModal();
         }
       } catch (error) {
@@ -164,12 +219,10 @@
       }
     }
 
-    window.onclick = function(event) {
+    window.addEventListener('click', function(event) {
       const modal = document.getElementById('flower-modal');
-      if (event.target == modal) {
-        closeFlowerModal();
-      }
-    }
+      if (event.target === modal) closeFlowerModal();
+    });
   </script>
 </body>
 </html>

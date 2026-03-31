@@ -1,7 +1,7 @@
 <header>
   <div class="container">
     <div class="header-content">
-      <a href="/" class="logo">FLORIST</a>
+      <a href="/" class="logo">HomeBuild</a>
       <div class="burger-menu" id="burger-menu">
         <span></span>
         <span></span>
@@ -17,6 +17,8 @@
           <% if (user) { %>
             <% if (user.role === 'admin') { %>
               <li><a href="/admin">Админ</a></li>
+            <% } else { %>
+              <li><a href="/account">Личный кабинет</a></li>
             <% } %>
             <li><a href="/logout">Выйти (<%= user.username %>)</a></li>
           <% } else { %>
